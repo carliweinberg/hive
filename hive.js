@@ -45,15 +45,17 @@ function checkBee(){            ////TODO: whitePlayedBee is logging the wrong th
     if ((whitePlayedBee && isWhitesTurn)|| (blackPlayedBee && !isWhitesTurn)){
         return true;
     }
-    else if (pieceToPlay.value = "bee"){
+    else if (pieceToPlay.value == "bee"){
         if(pieceToPlay.id == "white"){
+            console.log("here");
             whitePlayedBee = true;
             return true;
         }else{
             blackPlayedBee = true;
             return true;
         }
-    } else if ((isWhitesTurn && whitePlayCount < 4) || (blackPlayCount < 4 && !isWhitesTurn)){
+    } else if ((isWhitesTurn && whitePlayCount < 3) || (blackPlayCount < 3 && !isWhitesTurn)){
+        console.log(whitePlayCount + " " + isWhitesTurn + " __ white turn and hten play count")
         return true;
     } else{
         console.log("more then 4 and haven't played bee");
@@ -63,11 +65,12 @@ function checkBee(){            ////TODO: whitePlayedBee is logging the wrong th
 }
 
 function gameUpdate(){
-    if (isWhitesTurn){
-        document.getElementById("whoseTurn").innerHTML  = "White's turn";
+    if (!isWhitesTurn){
+        document.getElementById("whoseTurn").innerHTML  = "Black's turn";
         whitePlayCount = whitePlayCount + 1;
     } else {
-        document.getElementById("whoseTurn").innerHTML  = "Black's turn";
+        document.getElementById("whoseTurn").innerHTML  = "White's turn";
+        console.log("increaseing blacks play count")
         blackPlayCount = blackPlayCount + 1;
     }
 }

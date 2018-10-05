@@ -11,6 +11,8 @@ var whitePlayCount = 0;
 var blackPlayCount = 0;
 var whitePlayedBee = false;
 var blackPlayedBee = false;
+var gamePlaying = true;
+
 
 document.getElementById("canvas").addEventListener("click", placeClickedOn, false);
 
@@ -38,16 +40,12 @@ function placeClickedOn(e) {
 
 
 function checkBee(){            ////TODO: whitePlayedBee is logging the wrong thing, trying to get it so you have to play the bee within 4
-    console.log("checking bee");
-    console.log(isWhitesTurn + " ___whose turn");
-    console.log(whitePlayedBee + " whited played bee");
-    console.log(whitePlayCount);
+   
     if ((whitePlayedBee && isWhitesTurn)|| (blackPlayedBee && !isWhitesTurn)){
         return true;
     }
     else if (pieceToPlay.value == "bee"){
         if(pieceToPlay.id == "white"){
-            console.log("here");
             whitePlayedBee = true;
             return true;
         }else{
@@ -55,10 +53,8 @@ function checkBee(){            ////TODO: whitePlayedBee is logging the wrong th
             return true;
         }
     } else if ((isWhitesTurn && whitePlayCount < 3) || (blackPlayCount < 3 && !isWhitesTurn)){
-        console.log(whitePlayCount + " " + isWhitesTurn + " __ white turn and hten play count")
         return true;
     } else{
-        console.log("more then 4 and haven't played bee");
         return false;
     }
     
@@ -70,13 +66,24 @@ function gameUpdate(){
         whitePlayCount = whitePlayCount + 1;
     } else {
         document.getElementById("whoseTurn").innerHTML  = "White's turn";
-        console.log("increaseing blacks play count")
         blackPlayCount = blackPlayCount + 1;
     }
 }
 
 function movePlacedPiece(thePiece){
     console.log(thePiece);
+
+    var c = document.getElementById('canvas');
+    var ctx = c.getContext("2d");
+    ctx.beginPath();
+    ctx.lineWidth="6";
+    ctx.strokeStyle="#c0c0c0";
+    ctx.rect(thePiece.leftMidX + 2,thePiece.leftMidY - 7,75,7); 
+    ctx.fillStyle = "#c0c0c0";
+    ctx.fill();
+    ctx.stroke();
+    pieceToPlay = thePiece;
+
 }
 
 function putPieceOnPlace(xPosition, yPosition){

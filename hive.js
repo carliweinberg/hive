@@ -12,6 +12,7 @@ var blackPlayCount = 0;
 var whitePlayedBee = false;
 var blackPlayedBee = false;
 var gamePlaying = true;
+var board = [];
 
 document.getElementById("canvas").addEventListener("click", placeClickedOn, false);
 
@@ -23,6 +24,13 @@ function placeClickedOn(e) {
         findTileClicked(xPosition, yPosition);
         if (placeSelected != null){
             putPieceOnPlace(xPosition, yPosition);
+            var a = new pieceOnBoard(pieceToPlay, placeSelected.keyNum);
+            board.push(a);
+            console.log(board);
+            console.log("here");
+            ///
+            ///var a = new hexTile(count);///
+            /////
             placeSelected = null;
             pieceToPlay = null;
         } 
@@ -119,6 +127,10 @@ function findTileClicked(x,y){
     }
 }
 
+function pieceOnBoard(piece, place){
+    this.piece = piece;
+    this.place = place;
+}
 
 function hexTile(keyNum) {
   

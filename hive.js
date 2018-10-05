@@ -35,6 +35,8 @@ function placeClickedOn(e) {
     
 }
 
+
+
 function checkBee(){            ////TODO: whitePlayedBee is logging the wrong thing, trying to get it so you have to play the bee within 4
     console.log("checking bee");
     console.log(isWhitesTurn + " ___whose turn");

@@ -13,7 +13,6 @@ var whitePlayedBee = false;
 var blackPlayedBee = false;
 var gamePlaying = true;
 
-
 document.getElementById("canvas").addEventListener("click", placeClickedOn, false);
 
 function placeClickedOn(e) {
@@ -26,7 +25,6 @@ function placeClickedOn(e) {
             putPieceOnPlace(xPosition, yPosition);
             placeSelected = null;
             pieceToPlay = null;
-
         } 
         gameUpdate();
     }else{
@@ -34,7 +32,6 @@ function placeClickedOn(e) {
         movePlacedPiece(placeSelected);
         gameUpdate();
     }
-    
 }
 
 
@@ -73,17 +70,20 @@ function gameUpdate(){
 function movePlacedPiece(thePiece){
     console.log(thePiece);
 
+    removeText(thePiece.leftMidX, thePiece.leftMidY);
+    
+}
+
+function removeText(pieceLeftMidX , pieceLeftMidY){
     var c = document.getElementById('canvas');
     var ctx = c.getContext("2d");
     ctx.beginPath();
     ctx.lineWidth="6";
     ctx.strokeStyle="#c0c0c0";
-    ctx.rect(thePiece.leftMidX + 2,thePiece.leftMidY - 7,75,7); 
+    ctx.rect(pieceLeftMidX + 2,pieceLeftMidY - 7,75,7); 
     ctx.fillStyle = "#c0c0c0";
     ctx.fill();
     ctx.stroke();
-    pieceToPlay = thePiece;
-
 }
 
 function putPieceOnPlace(xPosition, yPosition){
@@ -96,9 +96,11 @@ function putPieceOnPlace(xPosition, yPosition){
     /////////////////////////
     canvas.font = "13px Arial";
     canvas.fillStyle = pieceToPlay.id; 
-    canvas.fillText(pieceToPlay.value, placeSelected.leftMidX + 5, placeSelected.leftMidY); ///placeSelectd not 
+    canvas.fillText(pieceToPlay.value, placeSelected.leftMidX + 5, placeSelected.leftMidY); 
     pieceToPlay.disabled = true;
-    pieceToPlay.style.backgroundColor = "#7FFF00";
+    if(pieceToPlay.style != null){
+        pieceToPlay.style.backgroundColor = "#7FFF00";
+    }
     if (isWhitesTurn){
         isWhitesTurn = false;
     } else{
@@ -109,14 +111,10 @@ function putPieceOnPlace(xPosition, yPosition){
 function findTileClicked(x,y){
     for(var i = 0; i <allTiles.length; i++){
         if(allTiles[i].leftTopX < x && allTiles[i].rightTopX > x && allTiles[i].leftTopY < y && allTiles[i].leftBotY >y){
-            // if (allTiles[i].type == "empty" ) {
                 if(allTiles[i].tileType == "empty"){
                     allTiles[i].tileType = pieceToPlay.value;
                 }
                 placeSelected = allTiles[i];
-            // } else{
-            //    placeSelected = null;
-            // }
         }
     }
 }

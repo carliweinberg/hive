@@ -12,37 +12,62 @@ var blackPlayCount = 0;
 var whitePlayedBee = false;
 var blackPlayedBee = false;
 var gamePlaying = true;
+var boardPlaceSelected = null;
 var board = [];
 
 document.getElementById("canvas").addEventListener("click", placeClickedOn, false);
 
+function newPieceClickedToPlay(){
+    if (isWhitesTurn && this.id == "white" ){
+        pieceToPlay = this;
+    } else if (!isWhitesTurn && this.id == "black"){
+        pieceToPlay = this;
+    }else{
+        pieceToPlay = null;
+    }
+}
+
 function placeClickedOn(e) {
     var xPosition = e.pageX;
     var yPosition = e.pageY;
-    if (pieceToPlay != null && checkBee()){
+    
+    //boardPlaceSelected = findTileClicked(xPosition, yPosition);
+    boardIdSelected = findTileClicked(xPosition, yPosition);
+    console.log("hre");
 
-        findTileClicked(xPosition, yPosition);
-        if (placeSelected != null){
-            putPieceOnPlace(xPosition, yPosition);
-            var a = new pieceOnBoard(pieceToPlay, placeSelected.keyNum);
-            board.push(a);
-            console.log(board);           
-            placeSelected = null;
-            pieceToPlay = null;
-        } 
-        gameUpdate();
-    }else{
-        findTileClicked(xPosition, yPosition);
-        movePlacedPiece(placeSelected);
+    if (pieceToPlay == null){
+         if(isPlaceOnBoardEmpty(boardIdSelected)){
+             console.log("need to select a piece to move or a piece to place")
+         }
+         else{       //moving an already place piece
+             console.log("moving an alreday placed piece");
+    //         console.log(boardPlaceSelected);
+    //         console.log(isWhitesTurn);
+    //         var button = document.createElement("button");
+    //         button.innerHTML = boardPlaceSelected.tileType;
+    //         if (isWhitesTurn){
+    //             button.id = "white";
+    //         }else{
+    //             button.id = "black";
+    //         }
+    //         button.value = boardPlaceSelected.tileType; 
+    //         pieceToPlay = button;
+    //         removeText(boardPlaceSelected.leftMidX, boardPlaceSelected.leftMidY);
+    //         boardPlaceSelected.tileType = "empty";
+        }
+     }
+
+    else if(pieceToPlay != null && checkBee()){   
+        var theTile = findTileFromId(boardIdSelected);
+        putPieceOnPlace(theTile.leftMidX, theTile.leftMidY);
+        pieceToPlay = null;
         gameUpdate();
     }
     
+    
 }
 
-
-
-function checkBee(){          
-   
+function checkBee(){        
     if ((whitePlayedBee && isWhitesTurn)|| (blackPlayedBee && !isWhitesTurn)){
         return true;
     }
@@ -59,7 +84,6 @@ function checkBee(){
     } else{
         return false;
     }
-    
 }
 
 function gameUpdate(){
@@ -73,10 +97,7 @@ function gameUpdate(){
 }
 
 function movePlacedPiece(thePiece){
-    console.log(thePiece);
-
     removeText(thePiece.leftMidX, thePiece.leftMidY);
-    
 }
 
 function removeText(pieceLeftMidX , pieceLeftMidY){
@@ -91,8 +112,8 @@ function removeText(pieceLeftMidX , pieceLeftMidY){
     ctx.stroke();
 }
 
-function putPieceOnPlace(xPosition, yPosition){
-    var canvas = document.querySelector('#canvas').getContext('2d'),side = 0, size = 50,x = xPosition, y = yPosition;
+function putPieceOnPlace(xVal,yVal){
+    var canvas = document.querySelector('#canvas').getContext('2d'),side = 0, size = 50,x =xVal, y = yVal;
     /////////////////////
     var elem = document.getElementById('canvas');
     elemLeft = elem.offsetLeft;
@@ -101,9 +122,9 @@ function putPieceOnPlace(xPosition, yPosition){
     /////////////////////////
     canvas.font = "13px Arial";
     canvas.fillStyle = pieceToPlay.id; 
-    canvas.fillText(pieceToPlay.value, placeSelected.leftMidX + 5, placeSelected.leftMidY); 
-    pieceToPlay.disabled = true;
+    canvas.fillText(pieceToPlay.value, xVal + 5, yVal); 
     if(pieceToPlay.style != null){
+        pieceToPlay.disabled = true;
         pieceToPlay.style.backgroundColor = "#7FFF00";
     }
     if (isWhitesTurn){
@@ -111,25 +132,44 @@ function putPieceOnPlace(xPosition, yPosition){
     } else{
         isWhitesTurn = true;
     }
+   
 }
+
+function isPlaceOnBoardEmpty(idNumber){
+    for (var i = 0 ; i <board.length; i++){
+        if(board[i].placeNumber == idNumber){
+            return false;
+        }
+    }
+    return true;
+}
+
 
 function findTileClicked(x,y){
     for(var i = 0; i <allTiles.length; i++){
         if(allTiles[i].leftTopX < x && allTiles[i].rightTopX > x && allTiles[i].leftTopY < y && allTiles[i].leftBotY >y){
-                if(allTiles[i].tileType == "empty"){
-                    allTiles[i].tileType = pieceToPlay.value;
-                }
-                placeSelected = allTiles[i];
+                return allTiles[i].keyNum;
+        }
+    }
+    console.error("error finding tile clicked");
+}
+
+function findTileFromId(num){
+    for( var i =0; i < allTiles.length; i++){
+        if(allTiles[i].keyNum == num){
+            return allTiles[i];
         }
     }
 }
 
 class pieceOnBoard{
     constructor(piece, place){
-        this.piece = piece;
-        this.place = place;
+        this.pieceType = piece;
+        this.placeNumber = place;
+        this.pieceCOlor = color;
     }
 }
+
 
 function hexTile(keyNum) {
   
@@ -177,7 +217,6 @@ function hexTile(keyNum) {
 
     this.keyNum = keyNum;
     this.tileType = "empty";
-    
 }
 
 
@@ -214,19 +253,9 @@ function addTileButton(name, body, color){
     button.id = color;
     body.appendChild(button);
     button.value = name; 
-    button.addEventListener ("click", myFunc);
+    button.addEventListener ("click", newPieceClickedToPlay);
 }
     
-function myFunc(){
-    if (isWhitesTurn && this.id == "white" ){
-        pieceToPlay = this;
-    } else if (!isWhitesTurn && this.id == "black"){
-        pieceToPlay = this;
-    }else{
-        pieceToPlay = null;
-    }
-    
-}
 
 function drawAll(){
     x1 = 50;

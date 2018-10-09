@@ -26,11 +26,7 @@ function placeClickedOn(e) {
             putPieceOnPlace(xPosition, yPosition);
             var a = new pieceOnBoard(pieceToPlay, placeSelected.keyNum);
             board.push(a);
-            console.log(board);
-            console.log("here");
-            ///
-            ///var a = new hexTile(count);///
-            /////
+            console.log(board);           
             placeSelected = null;
             pieceToPlay = null;
         } 
@@ -40,11 +36,12 @@ function placeClickedOn(e) {
         movePlacedPiece(placeSelected);
         gameUpdate();
     }
+    
 }
 
 
 
-function checkBee(){            ////TODO: whitePlayedBee is logging the wrong thing, trying to get it so you have to play the bee within 4
+function checkBee(){          
    
     if ((whitePlayedBee && isWhitesTurn)|| (blackPlayedBee && !isWhitesTurn)){
         return true;
@@ -127,9 +124,11 @@ function findTileClicked(x,y){
     }
 }
 
-function pieceOnBoard(piece, place){
-    this.piece = piece;
-    this.place = place;
+class pieceOnBoard{
+    constructor(piece, place){
+        this.piece = piece;
+        this.place = place;
+    }
 }
 
 function hexTile(keyNum) {

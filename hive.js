@@ -146,6 +146,10 @@ function checkBee() {
 }
 
 function gameUpdate() {
+    if(checkIfWon(isWhitesTurn)){
+        alert("Winner!");
+    }
+
     if (!isWhitesTurn) {
         document.getElementById("whoseTurn").innerHTML = "Black's turn";
         whitePlayCount = whitePlayCount + 1;
@@ -154,9 +158,37 @@ function gameUpdate() {
         blackPlayCount = blackPlayCount + 1;
     }
     isMoving = false;
+    
 }
 
+function checkIfWon(isWhitesTurn){
+    var count = 0;
+    if(isWhitesTurn){
+        var color = "white";
+    }else{
+        var color = "black";
+    }
 
+    for(var i =0; i<board.length; i++){
+        if(board[i].pieceType == "bee"&& board[i].pieceColor == color){        //&& board[i].pieceColor == color
+            var beePlaceId = board[i].placeNumber;
+            var allPiecesAround = getAllPiecesAroundThisId(beePlaceId);
+            for(var a = 0; a < allPiecesAround.length; a++){
+                for(var b = 0; b < board.length; b++){
+                   if(board[b].placeNumber == allPiecesAround[a]){
+                       count = count + 1;
+                   }
+                }
+            }
+        }
+    }
+    if(count == 6){
+        return true;
+    }else{
+        return false;
+    }
+    
+}
 
 function removeText(pieceLeftMidX, pieceLeftMidY) {
     var c = document.getElementById('canvas');

@@ -1,3 +1,5 @@
+//TODO: BUGS:
+//click on the opposite teams piece to move, it disapears 
 
 var allTiles = [];
 window.scrollTo(500,900);
@@ -33,38 +35,38 @@ function placeClickedOn(e) {
     
     //boardPlaceSelected = findTileClicked(xPosition, yPosition);
     boardIdSelected = findTileClicked(xPosition, yPosition);
-    console.log("hre");
 
     if (pieceToPlay == null){
          if(isPlaceOnBoardEmpty(boardIdSelected)){
-             console.log("need to select a piece to move or a piece to place")
          }
-         else{       //moving an already place piece
-             console.log("moving an alreday placed piece");
-    //         console.log(boardPlaceSelected);
-    //         console.log(isWhitesTurn);
-    //         var button = document.createElement("button");
-    //         button.innerHTML = boardPlaceSelected.tileType;
-    //         if (isWhitesTurn){
-    //             button.id = "white";
-    //         }else{
-    //             button.id = "black";
-    //         }
-    //         button.value = boardPlaceSelected.tileType; 
-    //         pieceToPlay = button;
-    //         removeText(boardPlaceSelected.leftMidX, boardPlaceSelected.leftMidY);
-    //         boardPlaceSelected.tileType = "empty";
+         else if((getPieceOnBoard(boardIdSelected).pieceColor == "white" && isWhitesTurn) || getPieceOnBoard(boardIdSelected).pieceColor == "black" && !isWhitesTurn){                  
+            var button = document.createElement("button");
+            button.innerHTML = getPieceOnBoard(boardIdSelected).pieceType;
+            
+            if (isWhitesTurn){
+                button.id = "white";
+            }else{
+                button.id = "black";
+            }
+             button.value = getPieceOnBoard(boardIdSelected).pieceType;
+             pieceToPlay = button;
+            if(checkBee()){
+               removeText(findTileFromId(boardIdSelected).leftMidX, findTileFromId(boardIdSelected).leftMidY);
+                removePieceFromBoard(boardIdSelected); 
+            }
+            
         }
      }
 
-    else if(pieceToPlay != null && checkBee()){   
+    else if(pieceToPlay != null && checkBee() && isPlaceOnBoardEmpty(boardIdSelected)){   
         var theTile = findTileFromId(boardIdSelected);
         putPieceOnPlace(theTile.leftMidX, theTile.leftMidY);
+        var theNewPiece = new pieceOnBoard(pieceToPlay.value, boardIdSelected, pieceToPlay.id);
+        board.push(theNewPiece);
         pieceToPlay = null;
         gameUpdate();
+        console.log(board);
     }
-    
-    
 }
 
 function checkBee(){        
@@ -96,11 +98,9 @@ function gameUpdate(){
     }
 }
 
-function movePlacedPiece(thePiece){
-    removeText(thePiece.leftMidX, thePiece.leftMidY);
-}
 
-function removeText(pieceLeftMidX , pieceLeftMidY){
+
+function removeText(pieceLeftMidX , pieceLeftMidY){ 
     var c = document.getElementById('canvas');
     var ctx = c.getContext("2d");
     ctx.beginPath();
@@ -111,6 +111,8 @@ function removeText(pieceLeftMidX , pieceLeftMidY){
     ctx.fill();
     ctx.stroke();
 }
+
+
 
 function putPieceOnPlace(xVal,yVal){
     var canvas = document.querySelector('#canvas').getContext('2d'),side = 0, size = 50,x =xVal, y = yVal;
@@ -144,6 +146,22 @@ function isPlaceOnBoardEmpty(idNumber){
     return true;
 }
 
+function getPieceOnBoard(idNumber){
+    for (var i = 0 ; i <board.length; i++){
+        if(board[i].placeNumber == idNumber){
+            return board[i];
+        }
+    }
+}
+
+function removePieceFromBoard(idNumber){
+    for (var i = 0 ; i <board.length; i++){
+        if(board[i].placeNumber == idNumber){
+            board.splice(i,1);
+        }
+    }
+}
+
 
 function findTileClicked(x,y){
     for(var i = 0; i <allTiles.length; i++){
@@ -151,7 +169,6 @@ function findTileClicked(x,y){
                 return allTiles[i].keyNum;
         }
     }
-    console.error("error finding tile clicked");
 }
 
 function findTileFromId(num){
@@ -163,10 +180,10 @@ function findTileFromId(num){
 }
 
 class pieceOnBoard{
-    constructor(piece, place){
-        this.pieceType = piece;
+    constructor(type, place, color){
+        this.pieceType = type;
         this.placeNumber = place;
-        this.pieceCOlor = color;
+        this.pieceColor = color;
     }
 }
 
@@ -213,8 +230,7 @@ function hexTile(keyNum) {
         this.rightBotY = 146 + (90 *(amountDown-1));
 
     }
-
-
+    
     this.keyNum = keyNum;
     this.tileType = "empty";
 }

@@ -38,7 +38,6 @@ function placeClickedOn(e) {
 
     //boardPlaceSelected = findTileClicked(xPosition, yPosition);
     boardIdSelected = findTileClicked(xPosition, yPosition);
-    console.log(boardIdSelected);
     if (pieceToPlay == null) {
         if (isPlaceOnBoardEmpty(boardIdSelected)) {
         }
@@ -124,6 +123,25 @@ function checkIfOnlyTouchingItsColor(place, color) {
 }
 
 
+function checkMoveAnt(){
+
+}
+
+function checkMoveBee(){
+
+}
+
+function checkMoveSpider(){
+
+}
+
+function checkMoveBeetle(){
+
+}
+
+function checkMoveGrasshopper(){
+    
+}
 
 
 function checkBee() {
@@ -170,7 +188,7 @@ function checkIfWon(isWhitesTurn){
     }
 
     for(var i =0; i<board.length; i++){
-        if(board[i].pieceType == "bee"&& board[i].pieceColor == color){        //&& board[i].pieceColor == color
+        if(board[i].pieceType == "bee" && board[i].pieceColor == color){        //&& board[i].pieceColor == color
             var beePlaceId = board[i].placeNumber;
             var allPiecesAround = getAllPiecesAroundThisId(beePlaceId);
             for(var a = 0; a < allPiecesAround.length; a++){
@@ -186,8 +204,7 @@ function checkIfWon(isWhitesTurn){
         return true;
     }else{
         return false;
-    }
-    
+    } 
 }
 
 function removeText(pieceLeftMidX, pieceLeftMidY) {

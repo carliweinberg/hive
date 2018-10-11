@@ -17,6 +17,7 @@ var gamePlaying = true;
 var boardPlaceSelected = null;
 var board = [];
 
+
 document.getElementById("canvas").addEventListener("click", placeClickedOn, false);
 
 function newPieceClickedToPlay(){
@@ -60,14 +61,49 @@ function placeClickedOn(e) {
 
     else if(pieceToPlay != null && checkBee() && isPlaceOnBoardEmpty(boardIdSelected)){   
         var theTile = findTileFromId(boardIdSelected);
+       ////////////////
+        console.log(checkPlace(pieceToPlay.value, boardIdSelected, pieceToPlay.id));
+        ///////////////////
         putPieceOnPlace(theTile.leftMidX, theTile.leftMidY);
         var theNewPiece = new pieceOnBoard(pieceToPlay.value, boardIdSelected, pieceToPlay.id);
         board.push(theNewPiece);
         pieceToPlay = null;
         gameUpdate();
-        console.log(board);
     }
 }
+
+function checkPlace(piece, place, color){
+    if(whitePlayCount + blackPlayCount == 0){
+        return true;
+    }else if(whitePlayCount + blackPlayCount == 1){
+        var target = board[0].placeNumber;
+        if(place == target + 1 || place == target -1 || place == target - 99 || place == target + 100 || place == target - 100 || place == target + 99){
+            return true;
+        }
+        return false;
+    }else{
+        return checkIfOnlyTouchingItsColor(place,color);
+    }
+}
+
+function checkIfOnlyTouchingItsColor(place,color){
+    var piecesAroundIt = [];
+    piecesAroundIt.push(place + 1);
+    piecesAroundIt.push(place - 1);
+    piecesAroundIt.push(place - 99);
+    piecesAroundIt.push(place + 100);
+    piecesAroundIt.push(place - 100);
+    piecesAroundIt.push(place + 99);
+    for(var i = 0; i<board.length; i++){
+        if(piecesAroundIt.includes(board[i].placeNumber)){
+            console.log(board[i]);
+        }
+        //TODO: Bee is not coming up as being around the piece
+    }
+}
+
+
+
 
 function checkBee(){        
     if ((whitePlayedBee && isWhitesTurn)|| (blackPlayedBee && !isWhitesTurn)){

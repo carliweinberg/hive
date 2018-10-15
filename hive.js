@@ -17,7 +17,7 @@ var gamePlaying = true;
 var boardPlaceSelected = null;
 var board = [];
 var isMoving = false;
-
+var oldSpot = 0;
 
 
 document.getElementById("canvas").addEventListener("click", placeClickedOn, false);
@@ -55,6 +55,7 @@ function placeClickedOn(e) {
             if (checkBee()) {
                 removeText(findTileFromId(boardIdSelected).leftMidX, findTileFromId(boardIdSelected).leftMidY);
                 removePieceFromBoard(boardIdSelected);
+                oldSpot = boardIdSelected;
                 isMoving = true;
             }
 
@@ -89,24 +90,29 @@ function checkPlace(piece, place, color) {
     } else if(!isMoving){                                   //placing a piece
         return checkIfOnlyTouchingItsColor(place, color);
     }else{                                                  //moving a piece
+        if(piece == "bee"){     ///4141 working here
+            return checkMoveBee(place);
+        }
         return true;
     }
 }
 function getAllPiecesAroundThisId(place) {
     var piecesAroundIt = [];
     piecesAroundIt.push(place + 1);
-    piecesAroundIt.push(place - 1);
     if (Math.floor(place / 100) % 2 == 0) {
         piecesAroundIt.push(place - 100);
-        piecesAroundIt.push(place + 100);
         piecesAroundIt.push(place - 101);
+        piecesAroundIt.push(place - 1);
         piecesAroundIt.push(place + 99);
-    } else {
-        piecesAroundIt.push(place - 100);
         piecesAroundIt.push(place + 100);
+    } else {
         piecesAroundIt.push(place - 99);
+        piecesAroundIt.push(place - 100);
+        piecesAroundIt.push(place - 1);
+        piecesAroundIt.push(place + 100);
         piecesAroundIt.push(place + 101);
     }
+    
     return piecesAroundIt;
 }
 
@@ -122,13 +128,22 @@ function checkIfOnlyTouchingItsColor(place, color) {
     return true;
 }
 
+function willBeConnected(place){     //after this move the piece is still connected to other pieces
+    var piecesAround = getAllPiecesAroundThisId(place);
+    for (var i =0; i <board.length; i++){
+        if(piecesAround.includes(board[i].placeNumber)){
+            return true;
+        }
+    }
+    return false;
+}
 
 function checkMoveAnt(){
 
 }
 
-function checkMoveBee(){
-
+function checkMoveBee(place){   //TODO: add if the bee can fit through the space
+   return moveOne(place);
 }
 
 function checkMoveSpider(){
@@ -141,6 +156,53 @@ function checkMoveBeetle(){
 
 function checkMoveGrasshopper(){
     
+}
+
+function moveOne(place){ ///check if it is only 1 away and it can fit through
+    var piecesAroundOldSpot = getAllPiecesAroundThisId(oldSpot);
+    if(piecesAroundOldSpot.includes(place) && willBeConnected(place) && canFit(place, piecesAroundOldSpot)){  
+        return true;
+    }else{
+        return false;
+    }
+}
+
+function canFit(place,piecesAroundOldSpot){
+    var index = -1;
+    var left = -1;
+    var right = -1;
+    for(var i =0; i<piecesAroundOldSpot.length; i++){
+        if(piecesAroundOldSpot[i] == place){
+            index = i;
+        }
+    }
+    if(index == 0){
+        left = 1;
+        right = 5;
+    } else if(index == 5){
+        left = 0;
+        right = 4;
+    }else {
+        left = index + 1;
+        right = index -1;
+    }
+    index = piecesAroundOldSpot[index];
+    left = piecesAroundOldSpot[left];
+    right = piecesAroundOldSpot[right];
+    console.log(board);
+    console.log(left);
+    console.log(right);
+    var count = 0;
+    for(var x = 0; x <board.length; x++){
+        if(board[x].placeNumber == left || board[x].placeNumber == right){
+            count = count + 1;
+        }
+    }
+    if(count ==2){
+        return false;
+    }else {
+        return true;
+    }
 }
 
 

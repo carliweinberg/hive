@@ -38,6 +38,7 @@ function placeClickedOn(e) {
 
     //boardPlaceSelected = findTileClicked(xPosition, yPosition);
     boardIdSelected = findTileClicked(xPosition, yPosition);
+    console.log(boardIdSelected);
     if (pieceToPlay == null) {
         if (isPlaceOnBoardEmpty(boardIdSelected)) {
         }
@@ -87,11 +88,13 @@ function checkPlace(piece, place, color) {
             }
         }
         return false;
-    } else if(!isMoving){                                   //placing a piece
+    } else if (!isMoving) {                                   //placing a piece
         return checkIfOnlyTouchingItsColor(place, color);
-    }else{                                                  //moving a piece
-        if(piece == "bee"){     ///4141 working here
+    } else {                                                  //moving a piece
+        if (piece == "bee") {
             return checkMoveBee(place);
+        } else if (piece == "grasshopper") {
+            return checkMoveGrasshopper(place);
         }
         return true;
     }
@@ -112,7 +115,7 @@ function getAllPiecesAroundThisId(place) {
         piecesAroundIt.push(place + 100);
         piecesAroundIt.push(place + 101);
     }
-    
+
     return piecesAroundIt;
 }
 
@@ -127,80 +130,153 @@ function checkIfOnlyTouchingItsColor(place, color) {
     }
     return true;
 }
-
-function willBeConnected(place){     //after this move the piece is still connected to other pieces
+/////////////////////should be replaced where used with everythingTouching
+function willBeConnected(place) {     //after this move the piece is still connected to other pieces
     var piecesAround = getAllPiecesAroundThisId(place);
-    for (var i =0; i <board.length; i++){
-        if(piecesAround.includes(board[i].placeNumber)){
+    for (var i = 0; i < board.length; i++) {
+        if (piecesAround.includes(board[i].placeNumber)) {
             return true;
         }
     }
     return false;
 }
 
-function checkMoveAnt(){
+function getAllIdsFromBoard() {
+    // var idlist = [];
+    // for(var i=0; i<board.length; i++){
+    //     idlist.push(board[i].placeNumber);
+    // }
+}
+
+function everythingTouching(place, theList) {
+    // if(theList.parc)
+    // getAllPiecesAroundThisId(place);
+}
+
+function checkMoveAnt() {
 
 }
 
-function checkMoveBee(place){   //TODO: add if the bee can fit through the space
-   return moveOne(place);
+function checkMoveBee(place) {
+    return moveOne(place);
 }
 
-function checkMoveSpider(){
-
-}
-
-function checkMoveBeetle(){
+function checkMoveSpider() {
 
 }
 
-function checkMoveGrasshopper(){
-    
+function checkMoveBeetle() {
+
 }
 
-function moveOne(place){ ///check if it is only 1 away and it can fit through
+function checkMoveGrasshopper(place) {
+    var listBetween = [];
+    if (Math.abs(place - oldSpot) < 25) {
+        if (place > oldSpot) {                    /// going down straight
+            for (var a = 1; a < (place - oldSpot); a++) {
+                listBetween.push(a + oldSpot);
+            }
+            return (grasshopperCheckIfAnyGapsInJump(listBetween) && willBeConnected(place));
+
+        } else {                                  ///going up straight 
+            for (var a = 1; a < (oldSpot - place); a++) {
+                listBetween.push(a + place);
+            }
+            return (grasshopperCheckIfAnyGapsInJump(listBetween) && willBeConnected(place));
+        }
+    } else {
+        var old = Math.floor(oldSpot / 100);
+        var newOne = Math.floor(place / 100);
+        var jumpLength = newOne - old;
+        var oldOnesPlace = oldSpot % 100;
+        var newOnesPlace = place % 100;
+        console.log("old " + old + " new " + newOne + " dis" + jumpLength);
+        if (oldSpot < place) {
+            if (oldSpot % 2 == 0) {
+                if (newOnesPlace <= oldOnesPlace) {      
+                    if(jumpLength == 1 && oldSpot == place - 99){
+                        return willBeConnected(place);
+                    }
+                    console.log("up and to the right");
+                } else {
+                    console.log("down and to the right");
+                }
+            } else {
+                if (newOnesPlace < oldOnesPlace) {
+                    console.log("up and to the right");
+                } else {
+                    console.log("down and to the right");
+                }
+            }
+        } else {
+            if (oldSpot % 2 == 0) {
+                if (newOnesPlace < oldOnesPlace) {
+                    console.log("up and to the left");
+                } else {
+                    console.log("down and to the left");
+                }
+            } else {
+                if (newOnesPlace < oldOnesPlace) {
+                    console.log("up and to the left");
+                } else {
+                    console.log("down and to the left");
+                }
+            }
+        }
+
+    }
+    return false;
+}
+
+function grasshopperCheckIfAnyGapsInJump(listBetween) {
+    for (var b = 0; b < listBetween.length; b++) {
+        if (isPlaceOnBoardEmpty(listBetween[b]) != false) {
+            return false;
+        }
+    }
+    return true;
+}
+
+function moveOne(place) { ///check if it is only 1 away and it can fit through
     var piecesAroundOldSpot = getAllPiecesAroundThisId(oldSpot);
-    if(piecesAroundOldSpot.includes(place) && willBeConnected(place) && canFit(place, piecesAroundOldSpot)){  
+    if (piecesAroundOldSpot.includes(place) && willBeConnected(place) && canFit(place, piecesAroundOldSpot)) {
         return true;
-    }else{
+    } else {
         return false;
     }
 }
 
-function canFit(place,piecesAroundOldSpot){
+function canFit(place, piecesAroundOldSpot) {
     var index = -1;
     var left = -1;
     var right = -1;
-    for(var i =0; i<piecesAroundOldSpot.length; i++){
-        if(piecesAroundOldSpot[i] == place){
+    for (var i = 0; i < piecesAroundOldSpot.length; i++) {
+        if (piecesAroundOldSpot[i] == place) {
             index = i;
         }
     }
-    if(index == 0){
+    if (index == 0) {
         left = 1;
         right = 5;
-    } else if(index == 5){
+    } else if (index == 5) {
         left = 0;
         right = 4;
-    }else {
+    } else {
         left = index + 1;
-        right = index -1;
+        right = index - 1;
     }
     index = piecesAroundOldSpot[index];
     left = piecesAroundOldSpot[left];
     right = piecesAroundOldSpot[right];
-    console.log(board);
-    console.log(left);
-    console.log(right);
     var count = 0;
-    for(var x = 0; x <board.length; x++){
-        if(board[x].placeNumber == left || board[x].placeNumber == right){
+    for (var x = 0; x < board.length; x++) {
+        if (board[x].placeNumber == left || board[x].placeNumber == right) {
             count = count + 1;
         }
     }
-    if(count ==2){
+    if (count == 2) {
         return false;
-    }else {
+    } else {
         return true;
     }
 }
@@ -226,7 +302,7 @@ function checkBee() {
 }
 
 function gameUpdate() {
-    if(checkIfWon(isWhitesTurn)){
+    if (checkIfWon(isWhitesTurn)) {
         alert("Winner!");
     }
 
@@ -238,35 +314,35 @@ function gameUpdate() {
         blackPlayCount = blackPlayCount + 1;
     }
     isMoving = false;
-    
+
 }
 
-function checkIfWon(isWhitesTurn){
+function checkIfWon(isWhitesTurn) {
     var count = 0;
-    if(isWhitesTurn){
+    if (isWhitesTurn) {
         var color = "white";
-    }else{
+    } else {
         var color = "black";
     }
 
-    for(var i =0; i<board.length; i++){
-        if(board[i].pieceType == "bee" && board[i].pieceColor == color){        //&& board[i].pieceColor == color
+    for (var i = 0; i < board.length; i++) {
+        if (board[i].pieceType == "bee" && board[i].pieceColor == color) {        //&& board[i].pieceColor == color
             var beePlaceId = board[i].placeNumber;
             var allPiecesAround = getAllPiecesAroundThisId(beePlaceId);
-            for(var a = 0; a < allPiecesAround.length; a++){
-                for(var b = 0; b < board.length; b++){
-                   if(board[b].placeNumber == allPiecesAround[a]){
-                       count = count + 1;
-                   }
+            for (var a = 0; a < allPiecesAround.length; a++) {
+                for (var b = 0; b < board.length; b++) {
+                    if (board[b].placeNumber == allPiecesAround[a]) {
+                        count = count + 1;
+                    }
                 }
             }
         }
     }
-    if(count == 6){
+    if (count == 6) {
         return true;
-    }else{
+    } else {
         return false;
-    } 
+    }
 }
 
 function removeText(pieceLeftMidX, pieceLeftMidY) {

@@ -185,41 +185,80 @@ function checkMoveGrasshopper(place) {
             return (grasshopperCheckIfAnyGapsInJump(listBetween) && willBeConnected(place));
         }
     } else {
-        var old = Math.floor(oldSpot / 100);
+        var oldColNum = Math.floor(oldSpot / 100);
         var newOne = Math.floor(place / 100);
-        var jumpLength = newOne - old;
+        var jumpLength = Math.abs(newOne - oldColNum);
         var oldOnesPlace = oldSpot % 100;
         var newOnesPlace = place % 100;
-        console.log("old " + old + " new " + newOne + " dis" + jumpLength);
-        if (oldSpot < place) {
-            if (oldSpot % 2 == 0) {
-                if (newOnesPlace <= oldOnesPlace) {      
-                    if(jumpLength == 1 && oldSpot == place - 99){
-                        return willBeConnected(place);
-                    }
-                    console.log("up and to the right");
-                } else {
-                    console.log("down and to the right");
-                }
-            } else {
+        console.log(oldSpot + "  " + place + "----" + jumpLength);
+        if (oldSpot < place) {          //// going right
+            if (oldColNum % 2 == 0) {   /// on a tile starting with an even number
                 if (newOnesPlace < oldOnesPlace) {
-                    console.log("up and to the right");
+                    if (jumpLength == 1 && oldSpot == place - 99) {
+                        return true;
+                    }
+                    else {
+                        for (var m = 1; m < jumpLength; m++) {
+                            if (m % 2 == 0) {
+                                listBetween.push(place - (99 * (m / 2)) - (100 * (m / 2)));
+                            } else {
+                                listBetween.push(place - (99 * ((m - 1) / 2)) - (100 * ((m - 1) / 2)) - 100);
+                            }
+                        }
+                        if (jumpLength % 2 == 0) {
+                            if (oldSpot == place - (99 * (jumpLength / 2)) - (100 * (jumpLength / 2))) {
+                                return grasshopperCheckIfAnyGapsInJump(listBetween);
+                            }
+                        } else {
+                            if (oldSpot == place - (99 * ((jumpLength - 1) / 2)) - (100 * ((jumpLength - 1) / 2)) - 99) {
+                                return grasshopperCheckIfAnyGapsInJump(listBetween);
+                            }
+                        }
+                    }
                 } else {
-                    console.log("down and to the right");
+                    if (jumpLength == 1 && oldSpot == place - 100) {
+                        return true;
+                    }
+                    console.log("down and to the right 2");
+                }
+            } else {    ///on a tile starting with odd num
+                if (newOnesPlace < oldOnesPlace) {
+                    if (jumpLength == 1 && oldSpot == place - 100) {
+                        return true;
+                    }
+                    console.log("up and to the right 3");
+                } else {
+                    if (jumpLength == 1 && oldSpot == place - 101) {
+                        return true;
+                    }
+                    console.log("down and to the right 4");
                 }
             }
-        } else {
-            if (oldSpot % 2 == 0) {
+        } else {                 /// going left
+            if (oldColNum % 2 == 0) {       //// on tiles starting with an even numer
                 if (newOnesPlace < oldOnesPlace) {
-                    console.log("up and to the left");
+                    if (jumpLength == 1 && oldSpot == place + 101) {
+                        return true;
+                    }
+                    console.log("up and to the left 5");
                 } else {
-                    console.log("down and to the left");
+                    if (jumpLength == 1 && oldSpot == place + 100) {
+                        console.log("here55)");
+                        return true;
+                    }
+                    console.log("down and to the lef 6t");
                 }
             } else {
                 if (newOnesPlace < oldOnesPlace) {
-                    console.log("up and to the left");
+                    if (jumpLength == 1 && oldSpot == place + 99) {
+                        return true;
+                    }
+                    console.log("up and to the left 7");
                 } else {
-                    console.log("down and to the left");
+                    if (jumpLength == 1 && oldSpot == place + 100) {
+                        return true;
+                    }
+                    console.log("down and to the left 8");
                 }
             }
         }

@@ -185,10 +185,15 @@ function removeDuplicates(givenArray) {
     return returnArray;
 }
 
-function checkMoveAnt(place) {                      ///TODO: make sure ant can fit into new spot and fit out of old spot
-    var availableSpots = getPiecesBoardingBoard();
-    for (var i = 0; i < availableSpots.length; i++) {
-        if (availableSpots[i] == place) {
+function checkMoveAnt(place) {                      ///TODO: make inifite, and can pick any, so do not remove optoins 
+                                        ///does not have to be an exact 3 moves away like spider did
+    var optionsToGo = getOptionsOnce(oldSpot);
+    var optionsSecond = getOptionsMultiple(optionsToGo);
+    var optionsThird = getOptionsMultiple(optionsSecond);
+    
+
+    for(var i =0; i< optionsThird.length; i++){
+        if(f[i] == place){
             return true;
         }
     }

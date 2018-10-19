@@ -169,6 +169,33 @@ function checkMoveBeetle() {
 
 }
 
+function grasshopperListBetweenHelper(a , b , c, jumpLength, oldSpot, place, listBetween){
+   var d = 0;
+    if(jumpLength % 2 ==0){
+        d = b;
+    }else{
+        d = a;
+    }
+    for (var m = 1; m < jumpLength; m++) {
+        if (m % 2 == 0) {
+            listBetween.push(place - (a * (m / 2)) - (b * (m / 2)));
+        } else {
+            listBetween.push(place - (a * ((m - 1) / 2)) - (b * ((m - 1) / 2)) - d);
+        }
+    }
+    if (jumpLength % 2 == 0) {
+        if (oldSpot == place - (a * (jumpLength / 2)) - (b * (jumpLength / 2))) {
+            console.log(listBetween);
+            return grasshopperCheckIfAnyGapsInJump(listBetween);
+        }
+    } else {
+        if (oldSpot == place - (a * ((jumpLength - 1) / 2)) - (b * ((jumpLength - 1) / 2)) - a) {
+            console.log(listBetween);
+            return grasshopperCheckIfAnyGapsInJump(listBetween);
+        }
+    }
+}
+
 function checkMoveGrasshopper(place) {
     var listBetween = [];
     if (Math.abs(place - oldSpot) < 25) {
@@ -198,26 +225,15 @@ function checkMoveGrasshopper(place) {
                         return true;
                     }
                     else {
-                        for (var m = 1; m < jumpLength; m++) {
-                            if (m % 2 == 0) {
-                                listBetween.push(place - (99 * (m / 2)) - (100 * (m / 2)));
-                            } else {
-                                listBetween.push(place - (99 * ((m - 1) / 2)) - (100 * ((m - 1) / 2)) - 100);
-                            }
-                        }
-                        if (jumpLength % 2 == 0) {
-                            if (oldSpot == place - (99 * (jumpLength / 2)) - (100 * (jumpLength / 2))) {
-                                return grasshopperCheckIfAnyGapsInJump(listBetween);
-                            }
-                        } else {
-                            if (oldSpot == place - (99 * ((jumpLength - 1) / 2)) - (100 * ((jumpLength - 1) / 2)) - 99) {
-                                return grasshopperCheckIfAnyGapsInJump(listBetween);
-                            }
-                        }
+                       return grasshopperListBetweenHelper(99 , 100 , 3, jumpLength, oldSpot, place, listBetween);
                     }
+                    console.log("up and to the right 1");
                 } else {
                     if (jumpLength == 1 && oldSpot == place - 100) {
                         return true;
+                    }
+                    else {
+                       return grasshopperListBetweenHelper(100, 101, 3, jumpLength, oldSpot, place, listBetween);
                     }
                     console.log("down and to the right 2");
                 }
@@ -225,11 +241,16 @@ function checkMoveGrasshopper(place) {
                 if (newOnesPlace < oldOnesPlace) {
                     if (jumpLength == 1 && oldSpot == place - 100) {
                         return true;
+                    }else{
+                        return grasshopperListBetweenHelper(100, 99, 3, jumpLength, oldSpot, place, listBetween);
                     }
                     console.log("up and to the right 3");
                 } else {
                     if (jumpLength == 1 && oldSpot == place - 101) {
                         return true;
+                    }
+                    else{
+                        return grasshopperListBetweenHelper(101, 100, 3, jumpLength, oldSpot, place, listBetween);
                     }
                     console.log("down and to the right 4");
                 }

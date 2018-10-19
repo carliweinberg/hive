@@ -261,11 +261,16 @@ function checkMoveGrasshopper(place) {
                     if (jumpLength == 1 && oldSpot == place + 101) {
                         return true;
                     }
+                    else{ 
+                        return grasshopperListBetweenHelper(-101, -100, 3, jumpLength, oldSpot, place, listBetween);
+                    }
                     console.log("up and to the left 5");
                 } else {
                     if (jumpLength == 1 && oldSpot == place + 100) {
-                        console.log("here55)");
                         return true;
+                    }
+                    else{ 
+                        return grasshopperListBetweenHelper(-100, -99, 3, jumpLength, oldSpot, place, listBetween);
                     }
                     console.log("down and to the lef 6t");
                 }
@@ -274,10 +279,15 @@ function checkMoveGrasshopper(place) {
                     if (jumpLength == 1 && oldSpot == place + 99) {
                         return true;
                     }
+                    else{
+                        return grasshopperListBetweenHelper(-100, -101, 3, jumpLength, oldSpot, place, listBetween);
+                    }
                     console.log("up and to the left 7");
                 } else {
                     if (jumpLength == 1 && oldSpot == place + 100) {
                         return true;
+                    }else{ 
+                        return grasshopperListBetweenHelper(-99, -100, 3, jumpLength, oldSpot, place, listBetween);
                     }
                     console.log("down and to the left 8");
                 }

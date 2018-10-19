@@ -95,6 +95,10 @@ function checkPlace(piece, place, color) {
             return checkMoveBee(place);
         } else if (piece == "grasshopper") {
             return checkMoveGrasshopper(place);
+        } else if (piece == "ant") {
+            return checkMoveAnt(place);
+        } else if (piece == "spider") {
+            return checkMoveSpider(place);
         }
         return true;
     }
@@ -142,10 +146,11 @@ function willBeConnected(place) {     //after this move the piece is still conne
 }
 
 function getAllIdsFromBoard() {
-    // var idlist = [];
-    // for(var i=0; i<board.length; i++){
-    //     idlist.push(board[i].placeNumber);
-    // }
+    var idlist = [];
+    for (var i = 0; i < board.length; i++) {
+        idlist.push(board[i].placeNumber);
+    }
+    return idlist;
 }
 
 function everythingTouching(place, theList) {
@@ -153,27 +158,98 @@ function everythingTouching(place, theList) {
     // getAllPiecesAroundThisId(place);
 }
 
-function checkMoveAnt() {
+function getPiecesBoardingBoard() {  //gets all empty tiles that are touching played pieces
+    var idlist = getAllIdsFromBoard();
+    var allEmptyTilesAroundBoard = [];
+    for (var i = 0; i < idlist.length; i++) {
+        var piecesAroundId = getAllPiecesAroundThisId(idlist[i]);
+        for (var b = 0; b < piecesAroundId.length; b++) {
+            if (isPlaceOnBoardEmpty(piecesAroundId[b])) {
+                allEmptyTilesAroundBoard.push(piecesAroundId[b]);
+            }
+        }
+    }
+    allEmptyTilesAroundBoard = removeDuplicates(allEmptyTilesAroundBoard);
+    return allEmptyTilesAroundBoard;
+}
 
+function removeDuplicates(givenArray) {
+    var returnArray = [];
+    for (var i = 0; i < givenArray.length; i++) {
+        if (returnArray.includes(givenArray[i])) {
+
+        } else {
+            returnArray.push(givenArray[i]);
+        }
+    }
+    return returnArray;
+}
+
+function checkMoveAnt(place) {                      ///TODO: make sure ant can fit into new spot and fit out of old spot
+    var availableSpots = getPiecesBoardingBoard();
+    for (var i = 0; i < availableSpots.length; i++) {
+        if (availableSpots[i] == place) {
+            return true;
+        }
+    }
+    return false;
 }
 
 function checkMoveBee(place) {
     return moveOne(place);
 }
 
-function checkMoveSpider() {
+function checkMoveSpider(place) {
+    var optionsToGo = getOptionsOnce(oldSpot);
+    var optionsSecond = getOptionsMultiple(optionsToGo);
+    var optionsThird = getOptionsMultiple(optionsSecond);
+    for(var i =0; i< optionsThird.length; i++){
+        if(optionsThird[i] == place){
+            return true;
+        }
+    }
+    return false;
+}
 
+function getOptionsOnce(place){     
+    var optionsToGo = [];
+    var idsAround = getAllPiecesAroundThisId(place);
+    for (var i = 0; i < idsAround.length ; i++) {
+        if (isPlaceOnBoardEmpty(idsAround[i])) {
+            if(canFit(idsAround[i], idsAround) && willBeConnected(idsAround[i])){
+                optionsToGo.push(idsAround[i]);
+            }
+        }
+    }
+    return optionsToGo;
+}
+
+function getOptionsMultiple(optionsToGo){         ////working here
+    var myList = [];
+    for(var j =0; j< optionsToGo.length; j++){
+        var idsAround = getAllPiecesAroundThisId(optionsToGo[j]);
+        var innerList = [];
+        for (var i = 0; i < idsAround.length ; i++) {
+            if (isPlaceOnBoardEmpty(idsAround[i])) {
+                if(canFit(idsAround[i], idsAround) && willBeConnected(idsAround[i])){
+                    innerList.push(idsAround[i]);
+                }
+            }
+        }
+        myList = myList.concat(innerList);
+    }
+    return removeDuplicates(myList);
 }
 
 function checkMoveBeetle() {
 
 }
 
-function grasshopperListBetweenHelper(a , b , c, jumpLength, oldSpot, place, listBetween){
-   var d = 0;
-    if(jumpLength % 2 ==0){
+function grasshopperListBetweenHelper(a, b, c, jumpLength, oldSpot, place, listBetween) {
+    var d = 0;
+    if (jumpLength % 2 == 0) {
         d = b;
-    }else{
+    } else {
         d = a;
     }
     for (var m = 1; m < jumpLength; m++) {
@@ -185,12 +261,10 @@ function grasshopperListBetweenHelper(a , b , c, jumpLength, oldSpot, place, lis
     }
     if (jumpLength % 2 == 0) {
         if (oldSpot == place - (a * (jumpLength / 2)) - (b * (jumpLength / 2))) {
-            console.log(listBetween);
             return grasshopperCheckIfAnyGapsInJump(listBetween);
         }
     } else {
         if (oldSpot == place - (a * ((jumpLength - 1) / 2)) - (b * ((jumpLength - 1) / 2)) - a) {
-            console.log(listBetween);
             return grasshopperCheckIfAnyGapsInJump(listBetween);
         }
     }
@@ -217,7 +291,6 @@ function checkMoveGrasshopper(place) {
         var jumpLength = Math.abs(newOne - oldColNum);
         var oldOnesPlace = oldSpot % 100;
         var newOnesPlace = place % 100;
-        console.log(oldSpot + "  " + place + "----" + jumpLength);
         if (oldSpot < place) {          //// going right
             if (oldColNum % 2 == 0) {   /// on a tile starting with an even number
                 if (newOnesPlace < oldOnesPlace) {
@@ -225,34 +298,30 @@ function checkMoveGrasshopper(place) {
                         return true;
                     }
                     else {
-                       return grasshopperListBetweenHelper(99 , 100 , 3, jumpLength, oldSpot, place, listBetween);
+                        return grasshopperListBetweenHelper(99, 100, 3, jumpLength, oldSpot, place, listBetween);
                     }
-                    console.log("up and to the right 1");
                 } else {
                     if (jumpLength == 1 && oldSpot == place - 100) {
                         return true;
                     }
                     else {
-                       return grasshopperListBetweenHelper(100, 101, 3, jumpLength, oldSpot, place, listBetween);
+                        return grasshopperListBetweenHelper(100, 101, 3, jumpLength, oldSpot, place, listBetween);
                     }
-                    console.log("down and to the right 2");
                 }
             } else {    ///on a tile starting with odd num
                 if (newOnesPlace < oldOnesPlace) {
                     if (jumpLength == 1 && oldSpot == place - 100) {
                         return true;
-                    }else{
+                    } else {
                         return grasshopperListBetweenHelper(100, 99, 3, jumpLength, oldSpot, place, listBetween);
                     }
-                    console.log("up and to the right 3");
                 } else {
                     if (jumpLength == 1 && oldSpot == place - 101) {
                         return true;
                     }
-                    else{
+                    else {
                         return grasshopperListBetweenHelper(101, 100, 3, jumpLength, oldSpot, place, listBetween);
                     }
-                    console.log("down and to the right 4");
                 }
             }
         } else {                 /// going left
@@ -261,35 +330,31 @@ function checkMoveGrasshopper(place) {
                     if (jumpLength == 1 && oldSpot == place + 101) {
                         return true;
                     }
-                    else{ 
+                    else {
                         return grasshopperListBetweenHelper(-101, -100, 3, jumpLength, oldSpot, place, listBetween);
                     }
-                    console.log("up and to the left 5");
                 } else {
                     if (jumpLength == 1 && oldSpot == place + 100) {
                         return true;
                     }
-                    else{ 
+                    else {
                         return grasshopperListBetweenHelper(-100, -99, 3, jumpLength, oldSpot, place, listBetween);
                     }
-                    console.log("down and to the lef 6t");
                 }
             } else {
                 if (newOnesPlace < oldOnesPlace) {
                     if (jumpLength == 1 && oldSpot == place + 99) {
                         return true;
                     }
-                    else{
+                    else {
                         return grasshopperListBetweenHelper(-100, -101, 3, jumpLength, oldSpot, place, listBetween);
                     }
-                    console.log("up and to the left 7");
                 } else {
                     if (jumpLength == 1 && oldSpot == place + 100) {
                         return true;
-                    }else{ 
+                    } else {
                         return grasshopperListBetweenHelper(-99, -100, 3, jumpLength, oldSpot, place, listBetween);
                     }
-                    console.log("down and to the left 8");
                 }
             }
         }

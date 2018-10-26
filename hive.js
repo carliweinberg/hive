@@ -1,5 +1,6 @@
 //TODO: BUGS:
 //click on the opposite teams piece to move, it disapears 
+//ant only checks that it can move one and that the new spot is available one away. There could be a big loop that it can not get into but it would think it could
 
 var allTiles = [];
 window.scrollTo(500, 900);
@@ -45,7 +46,6 @@ function placeClickedOn(e) {
         else if ((getPieceOnBoard(boardIdSelected).pieceColor == "white" && isWhitesTurn) || getPieceOnBoard(boardIdSelected).pieceColor == "black" && !isWhitesTurn) {
             var button = document.createElement("button");
             button.innerHTML = getPieceOnBoard(boardIdSelected).pieceType;
-
             if (isWhitesTurn) {
                 button.id = "white";
             } else {
@@ -62,7 +62,16 @@ function placeClickedOn(e) {
 
         }
     }
-
+    else if (pieceToPlay != null && boardIdSelected == oldSpot) {
+        console.log("it happended ");
+        var theTile = findTileFromId(boardIdSelected);
+        putPieceOnPlace(theTile.leftMidX, theTile.leftMidY);
+        var theNewPiece = new pieceOnBoard(pieceToPlay.value, boardIdSelected, pieceToPlay.id);
+        board.push(theNewPiece);
+        pieceToPlay = null;
+        isMoving = false;
+        oldSpot = 0;
+    }
     else if (pieceToPlay != null && checkBee() && isPlaceOnBoardEmpty(boardIdSelected)) {
         var theTile = findTileFromId(boardIdSelected);
 
@@ -185,17 +194,21 @@ function removeDuplicates(givenArray) {
     return returnArray;
 }
 
-function checkMoveAnt(place) {                      ///TODO: make inifite, and can pick any, so do not remove optoins 
-                                        ///does not have to be an exact 3 moves away like spider did
-    var optionsToGo = getOptionsOnce(oldSpot);
-    var optionsSecond = getOptionsMultiple(optionsToGo);
-    var optionsThird = getOptionsMultiple(optionsSecond);
-    
+function checkMoveAnt(place) {      /// not perfect: TODO: it only check that one away is open. you could be stuck in a bigger circle it does not check that
+    return isSpotAccessible(place) && isSpotAccessible(oldSpot);
+}
 
-    for(var i =0; i< optionsThird.length; i++){
-        if(f[i] == place){
-            return true;
-        }
+function isSpotAccessible(place) { //can you in fact put a piece in that place
+
+    var piecesAround = getAllPiecesAroundThisId(place);
+
+    if (isPlaceOnBoardEmpty(piecesAround[0]) && isPlaceOnBoardEmpty(piecesAround[1]) ||
+        (isPlaceOnBoardEmpty(piecesAround[1]) && isPlaceOnBoardEmpty(piecesAround[2])) ||
+        (isPlaceOnBoardEmpty(piecesAround[2]) && isPlaceOnBoardEmpty(piecesAround[3])) ||
+        (isPlaceOnBoardEmpty(piecesAround[3]) && isPlaceOnBoardEmpty(piecesAround[4])) ||
+        (isPlaceOnBoardEmpty(piecesAround[4]) && isPlaceOnBoardEmpty(piecesAround[5])) ||
+        (isPlaceOnBoardEmpty(piecesAround[5]) && isPlaceOnBoardEmpty(piecesAround[0]))) {
+        return true;
     }
     return false;
 }
@@ -208,20 +221,20 @@ function checkMoveSpider(place) {
     var optionsToGo = getOptionsOnce(oldSpot);
     var optionsSecond = getOptionsMultiple(optionsToGo);
     var optionsThird = getOptionsMultiple(optionsSecond);
-    for(var i =0; i< optionsThird.length; i++){
-        if(optionsThird[i] == place){
+    for (var i = 0; i < optionsThird.length; i++) {
+        if (optionsThird[i] == place) {
             return true;
         }
     }
     return false;
 }
 
-function getOptionsOnce(place){     
+function getOptionsOnce(place) {
     var optionsToGo = [];
     var idsAround = getAllPiecesAroundThisId(place);
-    for (var i = 0; i < idsAround.length ; i++) {
+    for (var i = 0; i < idsAround.length; i++) {
         if (isPlaceOnBoardEmpty(idsAround[i])) {
-            if(canFit(idsAround[i], idsAround) && willBeConnected(idsAround[i])){
+            if (canFit(idsAround[i], idsAround) && willBeConnected(idsAround[i])) {
                 optionsToGo.push(idsAround[i]);
             }
         }
@@ -229,14 +242,14 @@ function getOptionsOnce(place){
     return optionsToGo;
 }
 
-function getOptionsMultiple(optionsToGo){         ////working here
+function getOptionsMultiple(optionsToGo) {         ////working here
     var myList = [];
-    for(var j =0; j< optionsToGo.length; j++){
+    for (var j = 0; j < optionsToGo.length; j++) {
         var idsAround = getAllPiecesAroundThisId(optionsToGo[j]);
         var innerList = [];
-        for (var i = 0; i < idsAround.length ; i++) {
+        for (var i = 0; i < idsAround.length; i++) {
             if (isPlaceOnBoardEmpty(idsAround[i])) {
-                if(canFit(idsAround[i], idsAround) && willBeConnected(idsAround[i])){
+                if (canFit(idsAround[i], idsAround) && willBeConnected(idsAround[i])) {
                     innerList.push(idsAround[i]);
                 }
             }
@@ -454,6 +467,7 @@ function gameUpdate() {
         blackPlayCount = blackPlayCount + 1;
     }
     isMoving = false;
+    oldSpot = 0;
 
 }
 
@@ -496,8 +510,6 @@ function removeText(pieceLeftMidX, pieceLeftMidY) {
     ctx.fill();
     ctx.stroke();
 }
-
-
 
 function putPieceOnPlace(xVal, yVal) {
     var canvas = document.querySelector('#canvas').getContext('2d'), side = 0, size = 50, x = xVal, y = yVal;

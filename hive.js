@@ -42,6 +42,7 @@ function placeClickedOn(e) {
     console.log(boardIdSelected);
     if (pieceToPlay == null) {
         if (isPlaceOnBoardEmpty(boardIdSelected)) {
+            
         }
         else if ((getPieceOnBoard(boardIdSelected).pieceColor == "white" && isWhitesTurn) || getPieceOnBoard(boardIdSelected).pieceColor == "black" && !isWhitesTurn) {
             var button = document.createElement("button");
@@ -63,24 +64,48 @@ function placeClickedOn(e) {
         }
     }
     else if (pieceToPlay != null && boardIdSelected == oldSpot) {
-        console.log("it happended ");
         var theTile = findTileFromId(boardIdSelected);
         putPieceOnPlace(theTile.leftMidX, theTile.leftMidY);
         var theNewPiece = new pieceOnBoard(pieceToPlay.value, boardIdSelected, pieceToPlay.id);
+        pieceToPlay.disabled = false;
+        pieceToPlay.style.backgroundColor = "#000000";
         board.push(theNewPiece);
         pieceToPlay = null;
         isMoving = false;
         oldSpot = 0;
+
     }
     else if (pieceToPlay != null && checkBee() && isPlaceOnBoardEmpty(boardIdSelected)) {
         var theTile = findTileFromId(boardIdSelected);
 
         if (checkPlace(pieceToPlay.value, boardIdSelected, pieceToPlay.id)) {
-            putPieceOnPlace(theTile.leftMidX, theTile.leftMidY);
-            var theNewPiece = new pieceOnBoard(pieceToPlay.value, boardIdSelected, pieceToPlay.id);
-            board.push(theNewPiece);
-            pieceToPlay = null;
-            gameUpdate();
+            if (pieceToPlay.value == "beetle") {
+                if (isPlaceOnBoardEmpty(boardIdSelected)) {
+                    putPieceOnPlace(theTile.leftMidX, theTile.leftMidY);
+                    var theNewPiece = new pieceOnBoard(pieceToPlay.value, boardIdSelected, pieceToPlay.id);
+                    board.push(theNewPiece);
+                    pieceToPlay = null;
+                    gameUpdate();
+                }else{
+                   
+                }
+            } else {
+                putPieceOnPlace(theTile.leftMidX, theTile.leftMidY);
+                var theNewPiece = new pieceOnBoard(pieceToPlay.value, boardIdSelected, pieceToPlay.id);
+                board.push(theNewPiece);
+                pieceToPlay = null;
+                gameUpdate();
+            }
+        }
+    }
+    else if (pieceToPlay.value == "beetle"){
+        console.log("trying to put beetle on already placed piece");
+        ///todo working here 33
+        if(checkMoveBeetle(boardIdSelected)){
+            console.log("move it ");
+            
+        }else{
+            console.log("youa are not one away");
         }
     }
 }
@@ -108,6 +133,8 @@ function checkPlace(piece, place, color) {
             return checkMoveAnt(place);
         } else if (piece == "spider") {
             return checkMoveSpider(place);
+        } else if (piece == "beetle") {
+            return checkMoveBeetle(place);
         }
         return true;
     }
@@ -259,8 +286,13 @@ function getOptionsMultiple(optionsToGo) {         ////working here
     return removeDuplicates(myList);
 }
 
-function checkMoveBeetle() {
-
+function checkMoveBeetle(place) {
+    var piecesAroundOldSpot = getAllPiecesAroundThisId(oldSpot);
+    if (piecesAroundOldSpot.includes(place)) {
+        return true;
+    } else {
+        return false;
+    }
 }
 
 function grasshopperListBetweenHelper(a, b, c, jumpLength, oldSpot, place, listBetween) {

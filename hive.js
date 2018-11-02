@@ -5,6 +5,9 @@
 //make sure board piecesa are all conncted
 //beettle movement
 
+//refactoring 
+/// move isWhiteTurn logic out of place piece
+
 var allTiles = [];
 window.scrollTo(500, 900);
 drawAll();
@@ -65,11 +68,12 @@ function placeClickedOn(e) {
             }
 
         }
+
     }
     else if (pieceToPlay != null && boardIdSelected == oldSpot) { //putting back down the piece I just picked up 
                 //TODO: does not actually work. it puts the text back but then freezes 
         var theTile = findTileFromId(boardIdSelected);
-        putPieceOnPlace(theTile.leftMidX, theTile.leftMidY);
+        putPieceOnPlace(theTile.leftMidX, theTile.leftMidY, pieceToPlay.id, pieceToPlay.value);
         var theNewPiece = new pieceOnBoard(pieceToPlay.value, boardIdSelected, pieceToPlay.id);
         pieceToPlay.disabled = false;
         pieceToPlay.style.backgroundColor = "#000000";
@@ -81,24 +85,36 @@ function placeClickedOn(e) {
     }
     else if (pieceToPlay != null && checkBee() && isPlaceOnBoardEmpty(boardIdSelected)) {
         var theTile = findTileFromId(boardIdSelected);
-
         if (checkPlace(pieceToPlay.value, boardIdSelected, pieceToPlay.id)) {
-       
-                putPieceOnPlace(theTile.leftMidX, theTile.leftMidY);
+                putPieceOnPlace(theTile.leftMidX, theTile.leftMidY, pieceToPlay.id, pieceToPlay.value);
                 var theNewPiece = new pieceOnBoard(pieceToPlay.value, boardIdSelected, pieceToPlay.id);
                 board.push(theNewPiece);
+                if(pieceToPlay.value == "beetle" && getPieceOnBoard(oldSpot) != null){  //working here 33
+                    console.log("get stuff under bettle");
+                    var one = findTileFromId(oldSpot);
+                    console.log(one);
+                    console.log("^^^the tile");
+                    console.log(getPieceOnBoard(oldSpot))
+                    putPieceOnPlace(one.leftMidX, one.rightMidY, oldSpot, getPieceOnBoard(oldSpot).pieceType);
+                   // Make the bottom one get set to be on top    --- getPieceOnBoard(oldSpot.id).onTop = true;
+                   if (isWhitesTurn) {
+                    isWhitesTurn = false;
+                } else {
+                    isWhitesTurn = true;
+                }
+                }
+                
                 pieceToPlay = null;
                 gameUpdate();
-           
         }
     }
-    else if (pieceToPlay.value == "beetle") {   //playing a beetle
+    else if (pieceToPlay.value == "beetle") {   //playing a beetle on top of another piece
         if (checkMoveBeetle(boardIdSelected)) {
             var pieceGettingSatOn = getPieceOnBoard(boardIdSelected);
             if(!areThereTwoOnThisSpace(boardIdSelected)){
                 getPieceOnBoard(boardIdSelected).onTop = false;
                 var theTile = findTileFromId(boardIdSelected);
-                putPieceOnPlace(theTile.leftMidX, theTile.leftMidY);
+                putPieceOnPlace(theTile.leftMidX + 5, theTile.leftMidY - 5, pieceToPlay.id, pieceToPlay.value);
                 var theNewPiece = new pieceOnBoard(pieceToPlay.value, boardIdSelected, pieceToPlay.id);
                 board.push(theNewPiece);
                 pieceToPlay = null;
@@ -275,7 +291,7 @@ function getOptionsOnce(place) {
     return optionsToGo;
 }
 
-function getOptionsMultiple(optionsToGo) {         ////working here
+function getOptionsMultiple(optionsToGo) {         
     var myList = [];
     for (var j = 0; j < optionsToGo.length; j++) {
         var idsAround = getAllPiecesAroundThisId(optionsToGo[j]);
@@ -506,7 +522,6 @@ function gameUpdate() {
     }
     isMoving = false;
     oldSpot = 0;
-
 }
 
 function checkIfWon(isWhitesTurn) {
@@ -549,7 +564,7 @@ function removeText(pieceLeftMidX, pieceLeftMidY) {
     ctx.stroke();
 }
 
-function putPieceOnPlace(xVal, yVal) {
+function putPieceOnPlace(xVal, yVal, theId, theValue) {
     var canvas = document.querySelector('#canvas').getContext('2d'), side = 0, size = 50, x = xVal, y = yVal;
     /////////////////////
     var elem = document.getElementById('canvas');
@@ -558,8 +573,8 @@ function putPieceOnPlace(xVal, yVal) {
     context = elem.getContext('2d');
     /////////////////////////
     canvas.font = "13px Arial";
-    canvas.fillStyle = pieceToPlay.id;
-    canvas.fillText(pieceToPlay.value, xVal + 5, yVal);
+    canvas.fillStyle = theId;
+    canvas.fillText(theValue, xVal + 5, yVal);
     if (pieceToPlay.style != null) {
         pieceToPlay.disabled = true;
         pieceToPlay.style.backgroundColor = "#7FFF00";
@@ -593,13 +608,15 @@ function areThereTwoOnThisSpace(idNumber){
 }
 
 function getPieceOnBoard(idNumber) {
+    var pieceToReturn = null;
     for (var i = 0; i < board.length; i++) {
         if (board[i].placeNumber == idNumber && board[i].onTop) { 
-            console.log(board[i]);
-            console.log("^^^piece on board");
-            return board[i];
+            pieceToReturn = board[i];
+        } else if(pieceToReturn == null && board[i].placeNumber == idNumber ){
+            pieceToReturn = board[i];
         }
     }
+    return pieceToReturn;
 }
 
 function removePieceFromBoard(idNumber) {

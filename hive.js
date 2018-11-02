@@ -43,7 +43,7 @@ function placeClickedOn(e) {
     //boardPlaceSelected = findTileClicked(xPosition, yPosition);
     boardIdSelected = findTileClicked(xPosition, yPosition);
     console.log(boardIdSelected);
-    if (pieceToPlay == null) {
+    if (pieceToPlay == null) { //placing a piece
         if (isPlaceOnBoardEmpty(boardIdSelected)) {
 
         }
@@ -66,7 +66,8 @@ function placeClickedOn(e) {
 
         }
     }
-    else if (pieceToPlay != null && boardIdSelected == oldSpot) {
+    else if (pieceToPlay != null && boardIdSelected == oldSpot) { //putting back down the piece I just picked up 
+                //TODO: does not actually work. it puts the text back but then freezes 
         var theTile = findTileFromId(boardIdSelected);
         putPieceOnPlace(theTile.leftMidX, theTile.leftMidY);
         var theNewPiece = new pieceOnBoard(pieceToPlay.value, boardIdSelected, pieceToPlay.id);
@@ -82,46 +83,27 @@ function placeClickedOn(e) {
         var theTile = findTileFromId(boardIdSelected);
 
         if (checkPlace(pieceToPlay.value, boardIdSelected, pieceToPlay.id)) {
-            if (pieceToPlay.value == "beetle") {
-                if (isPlaceOnBoardEmpty(boardIdSelected)) {
-                    putPieceOnPlace(theTile.leftMidX, theTile.leftMidY);
-                    var theNewPiece = new pieceOnBoard(pieceToPlay.value, boardIdSelected, pieceToPlay.id);
-                    board.push(theNewPiece);
-                    pieceToPlay = null;
-                    gameUpdate();
-                } else {
-
-                }
-            } else {
+       
                 putPieceOnPlace(theTile.leftMidX, theTile.leftMidY);
                 var theNewPiece = new pieceOnBoard(pieceToPlay.value, boardIdSelected, pieceToPlay.id);
                 board.push(theNewPiece);
                 pieceToPlay = null;
                 gameUpdate();
-            }
+           
         }
     }
-    else if (pieceToPlay.value == "beetle") {
-        console.log("trying to put beetle on already placed piece");
-        ///todo working here 33
+    else if (pieceToPlay.value == "beetle") {   //playing a beetle
         if (checkMoveBeetle(boardIdSelected)) {
-            console.log("move it ");
             var pieceGettingSatOn = getPieceOnBoard(boardIdSelected);
-            console.log(areThereTwoOnThisSpace(boardIdSelected));
             if(!areThereTwoOnThisSpace(boardIdSelected)){
-                console.log(pieceGettingSatOn);
                 getPieceOnBoard(boardIdSelected).onTop = false;
-                console.log(pieceGettingSatOn);
                 var theTile = findTileFromId(boardIdSelected);
                 putPieceOnPlace(theTile.leftMidX, theTile.leftMidY);
                 var theNewPiece = new pieceOnBoard(pieceToPlay.value, boardIdSelected, pieceToPlay.id);
-                console.log(theNewPiece);
-                console.log("^^new piece");
                 board.push(theNewPiece);
                 pieceToPlay = null;
                 gameUpdate();
             }
-
         } else {
             console.log("youa are not one away");
         }
@@ -176,6 +158,11 @@ function getAllPiecesAroundThisId(place) {
     }
 
     return piecesAroundIt;
+}
+
+function getOnTopPiece(idNumber){       //TODO: make it so it gets the on Top piece
+                                        //TODO: anywhere that has board[i].placeNumber will need to grab just the top
+    
 }
 
 function checkIfOnlyTouchingItsColor(place, color) {
@@ -607,7 +594,9 @@ function areThereTwoOnThisSpace(idNumber){
 
 function getPieceOnBoard(idNumber) {
     for (var i = 0; i < board.length; i++) {
-        if (board[i].placeNumber == idNumber) {
+        if (board[i].placeNumber == idNumber && board[i].onTop) { 
+            console.log(board[i]);
+            console.log("^^^piece on board");
             return board[i];
         }
     }
@@ -615,7 +604,7 @@ function getPieceOnBoard(idNumber) {
 
 function removePieceFromBoard(idNumber) {
     for (var i = 0; i < board.length; i++) {
-        if (board[i].placeNumber == idNumber) {
+        if (board[i].placeNumber == idNumber && board[i].onTop) {
             board.splice(i, 1);
         }
     }

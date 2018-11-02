@@ -1,6 +1,9 @@
 //TODO: BUGS:
 //click on the opposite teams piece to move, it disapears 
 //ant only checks that it can move one and that the new spot is available one away. There could be a big loop that it can not get into but it would think it could
+// have to click in center of tile 
+//make sure board piecesa are all conncted
+//beettle movement
 
 var allTiles = [];
 window.scrollTo(500, 900);
@@ -42,7 +45,7 @@ function placeClickedOn(e) {
     console.log(boardIdSelected);
     if (pieceToPlay == null) {
         if (isPlaceOnBoardEmpty(boardIdSelected)) {
-            
+
         }
         else if ((getPieceOnBoard(boardIdSelected).pieceColor == "white" && isWhitesTurn) || getPieceOnBoard(boardIdSelected).pieceColor == "black" && !isWhitesTurn) {
             var button = document.createElement("button");
@@ -86,8 +89,8 @@ function placeClickedOn(e) {
                     board.push(theNewPiece);
                     pieceToPlay = null;
                     gameUpdate();
-                }else{
-                   
+                } else {
+
                 }
             } else {
                 putPieceOnPlace(theTile.leftMidX, theTile.leftMidY);
@@ -98,16 +101,32 @@ function placeClickedOn(e) {
             }
         }
     }
-    else if (pieceToPlay.value == "beetle"){
+    else if (pieceToPlay.value == "beetle") {
         console.log("trying to put beetle on already placed piece");
         ///todo working here 33
-        if(checkMoveBeetle(boardIdSelected)){
+        if (checkMoveBeetle(boardIdSelected)) {
             console.log("move it ");
-            
-        }else{
+            var pieceGettingSatOn = getPieceOnBoard(boardIdSelected);
+            console.log(areThereTwoOnThisSpace(boardIdSelected));
+            if(!areThereTwoOnThisSpace(boardIdSelected)){
+                console.log(pieceGettingSatOn);
+                getPieceOnBoard(boardIdSelected).onTop = false;
+                console.log(pieceGettingSatOn);
+                var theTile = findTileFromId(boardIdSelected);
+                putPieceOnPlace(theTile.leftMidX, theTile.leftMidY);
+                var theNewPiece = new pieceOnBoard(pieceToPlay.value, boardIdSelected, pieceToPlay.id);
+                console.log(theNewPiece);
+                console.log("^^new piece");
+                board.push(theNewPiece);
+                pieceToPlay = null;
+                gameUpdate();
+            }
+
+        } else {
             console.log("youa are not one away");
         }
     }
+    console.log(board);
 }
 
 function checkPlace(piece, place, color) {
@@ -575,6 +594,17 @@ function isPlaceOnBoardEmpty(idNumber) {
     return true;
 }
 
+function areThereTwoOnThisSpace(idNumber){
+    var count = 0;
+    for(var i = 0; i< board.length; i++){
+        if(board[i].placeNumber == idNumber){
+            count = count + 1;
+        }
+    }
+    console.log("count " + count);
+    return (count>1);
+}
+
 function getPieceOnBoard(idNumber) {
     for (var i = 0; i < board.length; i++) {
         if (board[i].placeNumber == idNumber) {
@@ -613,6 +643,7 @@ class pieceOnBoard {
         this.pieceType = type;
         this.placeNumber = place;
         this.pieceColor = color;
+        this.onTop = true;
     }
 }
 

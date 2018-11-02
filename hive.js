@@ -1,12 +1,14 @@
 //TODO: BUGS:
 //click on the opposite teams piece to move, it disapears 
 //ant only checks that it can move one and that the new spot is available one away. There could be a big loop that it can not get into but it would think it could
-// have to click in center of tile 
+// have to click in center of tile - fix clearing text to clear entire tile
 //make sure board piecesa are all conncted
 //beettle movement
 
 //refactoring 
 /// move isWhiteTurn logic out of place piece
+
+
 
 var allTiles = [];
 window.scrollTo(500, 900);
@@ -71,7 +73,7 @@ function placeClickedOn(e) {
 
     }
     else if (pieceToPlay != null && boardIdSelected == oldSpot) { //putting back down the piece I just picked up 
-                //TODO: does not actually work. it puts the text back but then freezes 
+        //TODO: does not actually work. it puts the text back but then freezes 
         var theTile = findTileFromId(boardIdSelected);
         putPieceOnPlace(theTile.leftMidX, theTile.leftMidY, pieceToPlay.id, pieceToPlay.value);
         var theNewPiece = new pieceOnBoard(pieceToPlay.value, boardIdSelected, pieceToPlay.id);
@@ -86,32 +88,31 @@ function placeClickedOn(e) {
     else if (pieceToPlay != null && checkBee() && isPlaceOnBoardEmpty(boardIdSelected)) {
         var theTile = findTileFromId(boardIdSelected);
         if (checkPlace(pieceToPlay.value, boardIdSelected, pieceToPlay.id)) {
-                putPieceOnPlace(theTile.leftMidX, theTile.leftMidY, pieceToPlay.id, pieceToPlay.value);
-                var theNewPiece = new pieceOnBoard(pieceToPlay.value, boardIdSelected, pieceToPlay.id);
-                board.push(theNewPiece);
-                if(pieceToPlay.value == "beetle" && getPieceOnBoard(oldSpot) != null){  //working here 33
-                    console.log("get stuff under bettle");
-                    var one = findTileFromId(oldSpot);
-                    console.log(one);
-                    console.log("^^^the tile");
-                    console.log(getPieceOnBoard(oldSpot))
-                    putPieceOnPlace(one.leftMidX, one.rightMidY, oldSpot, getPieceOnBoard(oldSpot).pieceType);
-                   // Make the bottom one get set to be on top    --- getPieceOnBoard(oldSpot.id).onTop = true;
-                   if (isWhitesTurn) {
+            putPieceOnPlace(theTile.leftMidX, theTile.leftMidY, pieceToPlay.id, pieceToPlay.value);
+            var theNewPiece = new pieceOnBoard(pieceToPlay.value, boardIdSelected, pieceToPlay.id);
+            board.push(theNewPiece);
+            if (pieceToPlay.value == "beetle" && getPieceOnBoard(oldSpot) != null) {  //working here 33
+                console.log("get stuff under bettle");
+                var one = findTileFromId(oldSpot);
+                console.log(one);
+                console.log("^^^the tile");
+                console.log(getPieceOnBoard(oldSpot))
+                putPieceOnPlace(one.leftMidX, one.rightMidY, oldSpot, getPieceOnBoard(oldSpot).pieceType);
+                // Make the bottom one get set to be on top    --- getPieceOnBoard(oldSpot.id).onTop = true;
+                if (isWhitesTurn) {
                     isWhitesTurn = false;
                 } else {
                     isWhitesTurn = true;
                 }
-                }
-                
-                pieceToPlay = null;
-                gameUpdate();
+            }
+            pieceToPlay = null;
+            gameUpdate();
         }
     }
     else if (pieceToPlay.value == "beetle") {   //playing a beetle on top of another piece
         if (checkMoveBeetle(boardIdSelected)) {
             var pieceGettingSatOn = getPieceOnBoard(boardIdSelected);
-            if(!areThereTwoOnThisSpace(boardIdSelected)){
+            if (!areThereTwoOnThisSpace(boardIdSelected)) {
                 getPieceOnBoard(boardIdSelected).onTop = false;
                 var theTile = findTileFromId(boardIdSelected);
                 putPieceOnPlace(theTile.leftMidX + 5, theTile.leftMidY - 5, pieceToPlay.id, pieceToPlay.value);
@@ -176,9 +177,9 @@ function getAllPiecesAroundThisId(place) {
     return piecesAroundIt;
 }
 
-function getOnTopPiece(idNumber){       //TODO: make it so it gets the on Top piece
-                                        //TODO: anywhere that has board[i].placeNumber will need to grab just the top
-    
+function getOnTopPiece(idNumber) {       //TODO: make it so it gets the on Top piece
+    //TODO: anywhere that has board[i].placeNumber will need to grab just the top
+
 }
 
 function checkIfOnlyTouchingItsColor(place, color) {
@@ -291,7 +292,7 @@ function getOptionsOnce(place) {
     return optionsToGo;
 }
 
-function getOptionsMultiple(optionsToGo) {         
+function getOptionsMultiple(optionsToGo) {
     var myList = [];
     for (var j = 0; j < optionsToGo.length; j++) {
         var idsAround = getAllPiecesAroundThisId(optionsToGo[j]);
@@ -558,7 +559,7 @@ function removeText(pieceLeftMidX, pieceLeftMidY) {
     ctx.beginPath();
     ctx.lineWidth = "6";
     ctx.strokeStyle = "#c0c0c0";
-    ctx.rect(pieceLeftMidX + 2, pieceLeftMidY - 7, 75, 7);
+    ctx.rect(pieceLeftMidX + 2, pieceLeftMidY -14, 75, 14);
     ctx.fillStyle = "#c0c0c0";
     ctx.fill();
     ctx.stroke();
@@ -596,23 +597,23 @@ function isPlaceOnBoardEmpty(idNumber) {
     return true;
 }
 
-function areThereTwoOnThisSpace(idNumber){
+function areThereTwoOnThisSpace(idNumber) {
     var count = 0;
-    for(var i = 0; i< board.length; i++){
-        if(board[i].placeNumber == idNumber){
+    for (var i = 0; i < board.length; i++) {
+        if (board[i].placeNumber == idNumber) {
             count = count + 1;
         }
     }
     console.log("count " + count);
-    return (count>1);
+    return (count > 1);
 }
 
 function getPieceOnBoard(idNumber) {
     var pieceToReturn = null;
     for (var i = 0; i < board.length; i++) {
-        if (board[i].placeNumber == idNumber && board[i].onTop) { 
+        if (board[i].placeNumber == idNumber && board[i].onTop) {
             pieceToReturn = board[i];
-        } else if(pieceToReturn == null && board[i].placeNumber == idNumber ){
+        } else if (pieceToReturn == null && board[i].placeNumber == idNumber) {
             pieceToReturn = board[i];
         }
     }

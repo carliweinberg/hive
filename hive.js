@@ -120,7 +120,11 @@ function placeClickedOn(e) {
         }
     }
     console.log(board);
+    console.log("**");
+    console.log(isEverythingConnected());
 }
+
+
 
 function checkPlace(piece, place, color) {
     if (whitePlayCount + blackPlayCount == 0) {              //first play
@@ -196,6 +200,41 @@ function willBeConnected(place) {     //after this move the piece is still conne
         }
     }
     return false;
+}
+
+
+function isEverythingConnected(){ ///33 working here
+ 
+    var entireList = [];
+    var boardIDs = getAllIdsFromBoard();
+    
+    for(var x = 0; x <boardIDs.length; x++){
+        var allIdsAroundID = getAllPiecesAroundThisId(boardIDs[x]);
+        var usedIdsAroundID = [];
+        for(var y = 0; y <allIdsAroundID.length; y++){
+            if(boardIDs.includes(allIdsAroundID[y])){
+                usedIdsAroundID.push(allIdsAroundID[y]);
+            }
+        }
+        entireList = entireList.concat(usedIdsAroundID);
+    }
+    entireList = removeDuplicates(entireList);
+    boardIDs = removeDuplicates(boardIDs);
+    console.log(entireList);
+    return theseArraysAreTheSame(entireList, boardIDs);
+    
+}
+
+function theseArraysAreTheSame(ar1, ar2){
+    if(ar1.length != ar2.length){
+        return false;
+    }
+    for(var x =0; x < ar1.length; x++){
+        if(!ar2.includes(ar1[x])){
+            return false;
+        }
+    }
+    return true;
 }
 
 function getAllIdsFromBoard() {

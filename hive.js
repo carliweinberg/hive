@@ -91,14 +91,9 @@ function placeClickedOn(e) {
             putPieceOnPlace(theTile.leftMidX, theTile.leftMidY, pieceToPlay.id, pieceToPlay.value);
             var theNewPiece = new pieceOnBoard(pieceToPlay.value, boardIdSelected, pieceToPlay.id);
             board.push(theNewPiece);
-            if (pieceToPlay.value == "beetle" && getPieceOnBoard(oldSpot) != null) {  //working here 33
-                console.log("get stuff under bettle");
+            if (pieceToPlay.value == "beetle" && getPieceOnBoard(oldSpot) != null) {  
                 var one = findTileFromId(oldSpot);
-                console.log(one);
-                console.log("^^^the tile");
-                console.log(getPieceOnBoard(oldSpot))
-                putPieceOnPlace(one.leftMidX, one.rightMidY, oldSpot, getPieceOnBoard(oldSpot).pieceType);
-                // Make the bottom one get set to be on top    --- getPieceOnBoard(oldSpot.id).onTop = true;
+                putPieceOnPlace(one.leftMidX, one.rightMidY,  getPieceOnBoard(oldSpot).pieceColor, getPieceOnBoard(oldSpot).pieceType);
                 if (isWhitesTurn) {
                     isWhitesTurn = false;
                 } else {

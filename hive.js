@@ -90,9 +90,9 @@ function placeClickedOn(e) {
             putPieceOnPlace(theTile.leftMidX, theTile.leftMidY, pieceToPlay.id, pieceToPlay.value);
             var theNewPiece = new pieceOnBoard(pieceToPlay.value, boardIdSelected, pieceToPlay.id);
             board.push(theNewPiece);
-            if (pieceToPlay.value == "beetle" && getPieceOnBoard(oldSpot) != null) {  
+            if (pieceToPlay.value == "beetle" && getPieceOnBoard(oldSpot) != null) {
                 var one = findTileFromId(oldSpot);
-                putPieceOnPlace(one.leftMidX, one.rightMidY,  getPieceOnBoard(oldSpot).pieceColor, getPieceOnBoard(oldSpot).pieceType);
+                putPieceOnPlace(one.leftMidX, one.rightMidY, getPieceOnBoard(oldSpot).pieceColor, getPieceOnBoard(oldSpot).pieceType);
                 if (isWhitesTurn) {
                     isWhitesTurn = false;
                 } else {
@@ -103,8 +103,8 @@ function placeClickedOn(e) {
             gameUpdate();
         }
     }
-    else if (pieceToPlay.value == "beetle") {   
-        if (checkMoveBeetle(boardIdSelected)) {
+    else if (pieceToPlay.value == "beetle") {
+        if (checkMoveBeetle(boardIdSelected) ) {
             var pieceGettingSatOn = getPieceOnBoard(boardIdSelected);
             if (!areThereTwoOnThisSpace(boardIdSelected)) {
                 getPieceOnBoard(boardIdSelected).onTop = false;
@@ -115,13 +115,9 @@ function placeClickedOn(e) {
                 pieceToPlay = null;
                 gameUpdate();
             }
-        } else {
-            console.log("youa are not one away");
-        }
+        } 
     }
     console.log(board);
-    console.log("**");
-    console.log(isEverythingConnected());
 }
 
 
@@ -131,7 +127,7 @@ function checkPlace(piece, place, color) {
         return true;
     } else if (whitePlayCount + blackPlayCount == 1) {      //second play 
         var target = board[0].placeNumber;
-        var piecesAroud = getAllPiecesAroundThisId(place);
+        var piecesAroud = getAllPlaceIdsAroundThisId(place);
         for (var i = 0; i < piecesAroud.length; i++) {
             if (piecesAroud[i] == target) {
                 return true;
@@ -155,7 +151,7 @@ function checkPlace(piece, place, color) {
         return true;
     }
 }
-function getAllPiecesAroundThisId(place) {
+function getAllPlaceIdsAroundThisId(place) {
     var piecesAroundIt = [];
     piecesAroundIt.push(place + 1);
     if (Math.floor(place / 100) % 2 == 0) {
@@ -181,7 +177,7 @@ function getOnTopPiece(idNumber) {       //TODO: make it so it gets the on Top p
 }
 
 function checkIfOnlyTouchingItsColor(place, color) {
-    piecesAroundIt = getAllPiecesAroundThisId(place);
+    piecesAroundIt = getAllPlaceIdsAroundThisId(place);
     for (var i = 0; i < board.length; i++) {
         if (piecesAroundIt.includes(board[i].placeNumber) && board[i].onTop) {
             if (board[i].pieceColor != color) {
@@ -193,7 +189,7 @@ function checkIfOnlyTouchingItsColor(place, color) {
 }
 /////////////////////should be replaced where used with everythingTouching
 function willBeConnected(place) {     //after this move the piece is still connected to other pieces
-    var piecesAround = getAllPiecesAroundThisId(place);
+    var piecesAround = getAllPlaceIdsAroundThisId(place);
     for (var i = 0; i < board.length; i++) {
         if (piecesAround.includes(board[i].placeNumber)) {
             return true;
@@ -203,34 +199,56 @@ function willBeConnected(place) {     //after this move the piece is still conne
 }
 
 
-function isEverythingConnected(){ ///33 working here
- 
+function isEverythingConnected() { ///33 working here
     var entireList = [];
     var boardIDs = getAllIdsFromBoard();
-    
-    for(var x = 0; x <boardIDs.length; x++){
-        var allIdsAroundID = getAllPiecesAroundThisId(boardIDs[x]);
-        var usedIdsAroundID = [];
-        for(var y = 0; y <allIdsAroundID.length; y++){
-            if(boardIDs.includes(allIdsAroundID[y])){
-                usedIdsAroundID.push(allIdsAroundID[y]);
-            }
-        }
-        entireList = entireList.concat(usedIdsAroundID);
-    }
-    entireList = removeDuplicates(entireList);
-    boardIDs = removeDuplicates(boardIDs);
-    console.log(entireList);
-    return theseArraysAreTheSame(entireList, boardIDs);
-    
+    var startingOne = boardIDs[0];
+    entireList.push(startingOne);
+    var leftToCheck = getAllPlacedPiecesIdsAroundThisId(startingOne);
+    return connectedHelper(entireList, boardIDs, leftToCheck);
 }
 
-function theseArraysAreTheSame(ar1, ar2){
-    if(ar1.length != ar2.length){
+function getAllPlacedPiecesIdsAroundThisId(theid) {
+    var returnList = [];
+    var allIds = getAllPlaceIdsAroundThisId(theid);
+    var boardIds = getAllIdsFromBoard();
+    for (var x = 0; x < allIds.length; x++) {
+        if (boardIds.includes(allIds[x])) {
+            returnList.push(allIds[x]);
+        }
+    }
+    return returnList;
+}
+
+function connectedHelper(entireList, boardIDs, leftToCheck) {
+
+    if (theseArraysAreTheSame(removeDuplicates(entireList), removeDuplicates(boardIDs))) {
+        return true;
+    }
+    else if (leftToCheck == null) {
         return false;
     }
-    for(var x =0; x < ar1.length; x++){
-        if(!ar2.includes(ar1[x])){
+    var nextOne = leftToCheck.pop();
+    if(nextOne == null){
+        return false;
+    }
+    var placedPiecesAroundNextOne = getAllPlacedPiecesIdsAroundThisId(nextOne);
+    for(var i =0; i<placedPiecesAroundNextOne.length; i++){
+        if(!entireList.includes(placedPiecesAroundNextOne[i])){
+            leftToCheck.push(placedPiecesAroundNextOne[i]);
+        }
+    }
+    entireList.push(nextOne);
+    return connectedHelper(removeDuplicates(entireList), boardIDs, leftToCheck);
+}
+
+function theseArraysAreTheSame(ar1, ar2) {
+
+    if (ar1.length != ar2.length) {
+        return false;
+    }
+    for (var x = 0; x < ar1.length; x++) {
+        if (!ar2.includes(ar1[x])) {
             return false;
         }
     }
@@ -247,14 +265,14 @@ function getAllIdsFromBoard() {
 
 function everythingTouching(place, theList) {
     // if(theList.parc)
-    // getAllPiecesAroundThisId(place);
+    // getAllPlaceIdsAroundThisId(place);
 }
 
 function getPiecesBoardingBoard() {  //gets all empty tiles that are touching played pieces
     var idlist = getAllIdsFromBoard();
     var allEmptyTilesAroundBoard = [];
     for (var i = 0; i < idlist.length; i++) {
-        var piecesAroundId = getAllPiecesAroundThisId(idlist[i]);
+        var piecesAroundId = getAllPlaceIdsAroundThisId(idlist[i]);
         for (var b = 0; b < piecesAroundId.length; b++) {
             if (isPlaceOnBoardEmpty(piecesAroundId[b])) {
                 allEmptyTilesAroundBoard.push(piecesAroundId[b]);
@@ -283,7 +301,7 @@ function checkMoveAnt(place) {      /// not perfect: TODO: it only check that on
 
 function isSpotAccessible(place) { //can you in fact put a piece in that place
 
-    var piecesAround = getAllPiecesAroundThisId(place);
+    var piecesAround = getAllPlaceIdsAroundThisId(place);
 
     if (isPlaceOnBoardEmpty(piecesAround[0]) && isPlaceOnBoardEmpty(piecesAround[1]) ||
         (isPlaceOnBoardEmpty(piecesAround[1]) && isPlaceOnBoardEmpty(piecesAround[2])) ||
@@ -314,7 +332,7 @@ function checkMoveSpider(place) {
 
 function getOptionsOnce(place) {
     var optionsToGo = [];
-    var idsAround = getAllPiecesAroundThisId(place);
+    var idsAround = getAllPlaceIdsAroundThisId(place);
     for (var i = 0; i < idsAround.length; i++) {
         if (isPlaceOnBoardEmpty(idsAround[i])) {
             if (canFit(idsAround[i], idsAround) && willBeConnected(idsAround[i])) {
@@ -328,7 +346,7 @@ function getOptionsOnce(place) {
 function getOptionsMultiple(optionsToGo) {
     var myList = [];
     for (var j = 0; j < optionsToGo.length; j++) {
-        var idsAround = getAllPiecesAroundThisId(optionsToGo[j]);
+        var idsAround = getAllPlaceIdsAroundThisId(optionsToGo[j]);
         var innerList = [];
         for (var i = 0; i < idsAround.length; i++) {
             if (isPlaceOnBoardEmpty(idsAround[i])) {
@@ -343,7 +361,7 @@ function getOptionsMultiple(optionsToGo) {
 }
 
 function checkMoveBeetle(place) {
-    var piecesAroundOldSpot = getAllPiecesAroundThisId(oldSpot);
+    var piecesAroundOldSpot = getAllPlaceIdsAroundThisId(oldSpot);
     if (piecesAroundOldSpot.includes(place)) {
         return true;
     } else {
@@ -479,7 +497,7 @@ function grasshopperCheckIfAnyGapsInJump(listBetween) {
 }
 
 function moveOne(place) { ///check if it is only 1 away and it can fit through
-    var piecesAroundOldSpot = getAllPiecesAroundThisId(oldSpot);
+    var piecesAroundOldSpot = getAllPlaceIdsAroundThisId(oldSpot);
     if (piecesAroundOldSpot.includes(place) && willBeConnected(place) && canFit(place, piecesAroundOldSpot)) {
         return true;
     } else {
@@ -569,7 +587,7 @@ function checkIfWon(isWhitesTurn) {
     for (var i = 0; i < board.length; i++) {
         if (board[i].pieceType == "bee" && board[i].pieceColor == color) {        //&& board[i].pieceColor == color
             var beePlaceId = board[i].placeNumber;
-            var allPiecesAround = getAllPiecesAroundThisId(beePlaceId);
+            var allPiecesAround = getAllPlaceIdsAroundThisId(beePlaceId);
             for (var a = 0; a < allPiecesAround.length; a++) {
                 for (var b = 0; b < board.length; b++) {
                     if (board[b].placeNumber == allPiecesAround[a]) {
@@ -592,7 +610,7 @@ function removeText(pieceLeftMidX, pieceLeftMidY) {
     ctx.beginPath();
     ctx.lineWidth = "6";
     ctx.strokeStyle = "#c0c0c0";
-    ctx.rect(pieceLeftMidX + 2, pieceLeftMidY -14, 75, 14);
+    ctx.rect(pieceLeftMidX + 2, pieceLeftMidY - 14, 75, 14);
     ctx.fillStyle = "#c0c0c0";
     ctx.fill();
     ctx.stroke();
@@ -637,7 +655,6 @@ function areThereTwoOnThisSpace(idNumber) {
             count = count + 1;
         }
     }
-    console.log("count " + count);
     return (count > 1);
 }
 

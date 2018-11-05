@@ -3,11 +3,11 @@
 //ant only checks that it can move one and that the new spot is available one away. There could be a big loop that it can not get into but it would think it could
 // have to click in center of tile - fix clearing text to clear entire tile
 //make sure board piecesa are all conncted
-//beettle movement
+//Beelte can only stack two high, but really you can put beetles on top of beetls more then just 2 high
+///
 
 //refactoring 
 /// move isWhiteTurn logic out of place piece
-
 
 
 var allTiles = [];
@@ -49,7 +49,7 @@ function placeClickedOn(e) {
     boardIdSelected = findTileClicked(xPosition, yPosition);
     console.log(boardIdSelected);
     if (pieceToPlay == null) { //placing a piece
-        if (isPlaceOnBoardEmpty(boardIdSelected)) {
+        if (isPlaceOnBoardEmpty(boardIdSelected)) {  //moving a placed piece
 
         }
         else if ((getPieceOnBoard(boardIdSelected).pieceColor == "white" && isWhitesTurn) || getPieceOnBoard(boardIdSelected).pieceColor == "black" && !isWhitesTurn) {
@@ -68,7 +68,6 @@ function placeClickedOn(e) {
                 oldSpot = boardIdSelected;
                 isMoving = true;
             }
-
         }
 
     }
@@ -85,7 +84,7 @@ function placeClickedOn(e) {
         oldSpot = 0;
 
     }
-    else if (pieceToPlay != null && checkBee() && isPlaceOnBoardEmpty(boardIdSelected)) {
+    else if (pieceToPlay != null && checkBee() && isPlaceOnBoardEmpty(boardIdSelected)) { //putting down a new piece
         var theTile = findTileFromId(boardIdSelected);
         if (checkPlace(pieceToPlay.value, boardIdSelected, pieceToPlay.id)) {
             putPieceOnPlace(theTile.leftMidX, theTile.leftMidY, pieceToPlay.id, pieceToPlay.value);
@@ -104,7 +103,7 @@ function placeClickedOn(e) {
             gameUpdate();
         }
     }
-    else if (pieceToPlay.value == "beetle") {   //playing a beetle on top of another piece
+    else if (pieceToPlay.value == "beetle") {   
         if (checkMoveBeetle(boardIdSelected)) {
             var pieceGettingSatOn = getPieceOnBoard(boardIdSelected);
             if (!areThereTwoOnThisSpace(boardIdSelected)) {
@@ -180,7 +179,7 @@ function getOnTopPiece(idNumber) {       //TODO: make it so it gets the on Top p
 function checkIfOnlyTouchingItsColor(place, color) {
     piecesAroundIt = getAllPiecesAroundThisId(place);
     for (var i = 0; i < board.length; i++) {
-        if (piecesAroundIt.includes(board[i].placeNumber)) {
+        if (piecesAroundIt.includes(board[i].placeNumber) && board[i].onTop) {
             if (board[i].pieceColor != color) {
                 return false;
             }

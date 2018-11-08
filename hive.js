@@ -2,7 +2,6 @@
 //click on the opposite teams piece to move, it disapears 
 //ant only checks that it can move one and that the new spot is available one away. There could be a big loop that it can not get into but it would think it could
 // have to click in center of tile - fix clearing text to clear entire tile
-//make sure board piecesa are all conncted
 //Beelte can only stack two high, but really you can put beetles on top of beetls more then just 2 high
 ///
 
@@ -657,7 +656,7 @@ function isPlaceOnBoardEmpty(idNumber) {
 function areThereTwoOnThisSpace(idNumber) {
     var count = 0;
     for (var i = 0; i < board.length; i++) {
-        if (board[i].placeNumber == idNumber) {
+        if (board[i].placeNumber == idNumber && board[i].pieceType != "beetle") {
             count = count + 1;
         }
     }

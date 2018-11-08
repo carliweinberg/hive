@@ -48,7 +48,7 @@ function placeClickedOn(e) {
     //boardPlaceSelected = findTileClicked(xPosition, yPosition);
     boardIdSelected = findTileClicked(xPosition, yPosition);
     console.log(boardIdSelected);
-    if (pieceToPlay == null) { //placing a piece
+    if (pieceToPlay == null && isEverythingConnected(boardIdSelected)) { //placing a piece
         if (isPlaceOnBoardEmpty(boardIdSelected)) {  //moving a placed piece
 
         }
@@ -84,7 +84,7 @@ function placeClickedOn(e) {
         oldSpot = 0;
 
     }
-    else if (pieceToPlay != null && checkBee() && isPlaceOnBoardEmpty(boardIdSelected)) { //putting down a new piece
+    else if (pieceToPlay != null && checkBee() && isPlaceOnBoardEmpty(boardIdSelected) && isEverythingConnected(boardIdSelected)) { //putting down a new piece
         var theTile = findTileFromId(boardIdSelected);
         if (checkPlace(pieceToPlay.value, boardIdSelected, pieceToPlay.id)) {
             putPieceOnPlace(theTile.leftMidX, theTile.leftMidY, pieceToPlay.id, pieceToPlay.value);
@@ -119,7 +119,6 @@ function placeClickedOn(e) {
     }
     console.log(board);
 }
-
 
 
 function checkPlace(piece, place, color) {
@@ -199,10 +198,17 @@ function willBeConnected(place) {     //after this move the piece is still conne
 }
 
 
-function isEverythingConnected() { ///33 working here
+function isEverythingConnected(theNewPlace) { ///33 working here
+    if (whitePlayCount + blackPlayCount == 0) {              //first play
+        return true;
+    } else if (whitePlayCount + blackPlayCount == 1) {  
+        return true;
+    }
+
     var entireList = [];
     var boardIDs = getAllIdsFromBoard();
-    var startingOne = boardIDs[0];
+    boardIDs.push(theNewPlace);
+    var startingOne = boardIDs[boardIDs.length-1];
     entireList.push(startingOne);
     var leftToCheck = getAllPlacedPiecesIdsAroundThisId(startingOne);
     return connectedHelper(entireList, boardIDs, leftToCheck);

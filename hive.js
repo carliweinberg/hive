@@ -47,11 +47,17 @@ function placeClickedOn(e) {
     //boardPlaceSelected = findTileClicked(xPosition, yPosition);
     boardIdSelected = findTileClicked(xPosition, yPosition);
     console.log(boardIdSelected);
-    if (pieceToPlay == null && isEverythingConnected(boardIdSelected)) { //placing a piece
+    console.log(pieceToPlay);
+    console.log(isEverythingConnected(boardIdSelected));
+    if (pieceToPlay == null && isEverythingConnected(boardIdSelected)) { //picking up a placed piece
+        console.log("opttion 1: picking up a placed piece");
+        console.log(getPieceOnBoard(boardIdSelected));
+        console.log(isWhitesTurn);
         if (isPlaceOnBoardEmpty(boardIdSelected)) {  //moving a placed piece
-
+            console.log("this happend");
         }
         else if ((getPieceOnBoard(boardIdSelected).pieceColor == "white" && isWhitesTurn) || getPieceOnBoard(boardIdSelected).pieceColor == "black" && !isWhitesTurn) {
+            console.log("trying here");
             var button = document.createElement("button");
             button.innerHTML = getPieceOnBoard(boardIdSelected).pieceType;
             if (isWhitesTurn) {
@@ -71,6 +77,7 @@ function placeClickedOn(e) {
 
     }
     else if (pieceToPlay != null && boardIdSelected == oldSpot) { //putting back down the piece I just picked up 
+        console.log("opttion 2: putting back down a piece");
         //TODO: does not actually work. it puts the text back but then freezes 
         var theTile = findTileFromId(boardIdSelected);
         putPieceOnPlace(theTile.leftMidX, theTile.leftMidY, pieceToPlay.id, pieceToPlay.value);
@@ -81,9 +88,9 @@ function placeClickedOn(e) {
         pieceToPlay = null;
         isMoving = false;
         oldSpot = 0;
-
     }
     else if (pieceToPlay != null && checkBee() && isPlaceOnBoardEmpty(boardIdSelected) && isEverythingConnected(boardIdSelected)) { //putting down a new piece
+        console.log("opttion 3: putting down new piece");
         var theTile = findTileFromId(boardIdSelected);
         if (checkPlace(pieceToPlay.value, boardIdSelected, pieceToPlay.id)) {
             putPieceOnPlace(theTile.leftMidX, theTile.leftMidY, pieceToPlay.id, pieceToPlay.value);
@@ -103,6 +110,7 @@ function placeClickedOn(e) {
         }
     }
     else if (pieceToPlay.value == "beetle") {
+        console.log("opttion 4: beetle");
         if (checkMoveBeetle(boardIdSelected) ) {
             var pieceGettingSatOn = getPieceOnBoard(boardIdSelected);
             if (!areThereTwoOnThisSpace(boardIdSelected)) {
@@ -116,7 +124,7 @@ function placeClickedOn(e) {
             }
         } 
     }
-    console.log(board);
+    //console.log(board);
 }
 
 
